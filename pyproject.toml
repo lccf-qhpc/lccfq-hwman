@@ -1,0 +1,13 @@
+[project]
+name = "lccfq-hwman"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.115.12",
+    "labcore",
+]
+
+[tool.uv.sources]
+labcore = { git = "https://github.com/toolsforexperiments/labcore" }
