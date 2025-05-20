@@ -2,10 +2,15 @@
 name = "lccfq-hwman"
 version = "0.1.0"
 description = "Add your description here"
+authors = [
+    {name = "Santiago Nuñez-Corrales", email = "nunezco2@illinois.edu"},
+    {name = "Marcos Frenkel", email = "marcosf2@illinois.edu"}
+]
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.12",
+    "gitpython>=3.1.44",
     "labcore",
 ]
 
