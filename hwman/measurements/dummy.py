@@ -1,5 +1,5 @@
 """
-Filename: main.py
+Filename: dummy.py
 Author: Marcos Frenkel
 Date: 2025-05-20
 Version: 1.0
