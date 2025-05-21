@@ -19,7 +19,7 @@ from labcore.measurement.storage import run_and_save_sweep
 DATADIR = "./data"
 
 
-def execute_measurement(sweep: Sweep, name: str) -> (Path, DataDict):
+def execute_measurement(sweep: Sweep, name: str) -> tuple[Path, DataDict]:
     """
     Wrapper function to execute measurements.
 
@@ -32,11 +32,11 @@ def execute_measurement(sweep: Sweep, name: str) -> (Path, DataDict):
 
     # Metadata collection should happen before the measurement
 
-    data_location, data = run_and_save_sweep(sweep=sweep, name=name, data_dir=DATADIR, return_data=True)
+    data_location, data = run_and_save_sweep(
+        sweep=sweep, name=name, data_dir=DATADIR, return_data=True
+    )
+
+    assert data is not None
+    data_location = Path(data_location)
 
     return data_location, data
-
-
-
-
-

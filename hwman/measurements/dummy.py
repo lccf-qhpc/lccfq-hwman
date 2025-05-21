@@ -20,6 +20,6 @@ def generate_dummy_sweep():
     @recording(dependent("dummy_data"))
     def dummy_data_generator():
         return randint(0, 10)
-    
+
     sweep = sweep_parameter("dummy_axis", range(0, 10), dummy_data_generator)
     return sweep

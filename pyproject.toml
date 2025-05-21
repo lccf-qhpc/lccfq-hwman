@@ -19,3 +19,9 @@ dependencies = [
 
 [tool.uv.sources]
 labcore = { git = "https://github.com/toolsforexperiments/labcore" }
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "ruff>=0.11.10",
+]
