@@ -1,0 +1,21 @@
+[project]
+name = "lccfq-hwman"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    {name = "Santiago Nuñez-Corrales", email = "nunezco2@illinois.edu"},
+    {name = "Marcos Frenkel", email = "marcosf2@illinois.edu"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.115.12",
+    "gitpython>=3.1.44",
+    "h5py>=3.13.0",
+    "labcore",
+    "pandas>=2.2.3",
+    "xarray>=2025.4.0",
+]
+
+[tool.uv.sources]
+labcore = { git = "https://github.com/toolsforexperiments/labcore" }
