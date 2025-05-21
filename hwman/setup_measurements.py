@@ -40,3 +40,4 @@ def execute_measurement(sweep: Sweep, name: str) -> tuple[Path, DataDict]:
     data_location = Path(data_location)
 
     return data_location, data
+    
