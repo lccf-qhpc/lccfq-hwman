@@ -44,6 +44,3 @@ async def dummy_measurement() -> dict[str, Path | dict[str, list[int]]]:
         ret[dep] = list(int(x) for x in data[dep]["values"])
 
     return {"data_location": data_location, "data": ret}
-
-
-
