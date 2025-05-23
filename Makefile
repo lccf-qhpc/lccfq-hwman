@@ -1,0 +1,21 @@
+PROTO_SRC_DIR := ./hwman/grpc/protobufs
+PROTO_OUT_DIR := ./hwman/grpc/protobufs_compiled
+PROTO_FILES := $(shell find $(PROTO_SRC_DIR) -name '*.proto')
+
+.PHONY: all protos clean
+
+all: protos
+
+protos:
+	@mkdir -p $(PROTO_OUT_DIR)
+	touch $(PROTO_OUT_DIR)/__init__.py
+	uv run -m grpc_tools.protoc \
+	  -I. \
+	  --python_out=$(PROTO_OUT_DIR) \
+	  --grpc_python_out=$(PROTO_OUT_DIR) \
+	  $(PROTO_FILES)
+	@find $(PROTO_OUT_DIR) -type f -name "*.py" -exec mv {} $(PROTO_OUT_DIR) \;
+	@find $(PROTO_OUT_DIR) -type d -not -path "$(PROTO_OUT_DIR)" -exec rm -rf {} +
+
+clean:
+	rm -rf $(PROTO_OUT_DIR)/* 
