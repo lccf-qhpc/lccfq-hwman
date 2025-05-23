@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+
+
+message JobRequest {
+  int32 id = 1;
+  string type = 2;
+  string result = 3;
+}
+
+message JobResponse {
+  int32 id = 1;
+  string type = 2;
+  string result = 3;
+}
+
+service JobDispatch {
+  rpc SubmitJob(JobRequest) returns (JobResponse);
+}
