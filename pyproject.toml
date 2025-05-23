@@ -11,6 +11,7 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.12",
     "gitpython>=3.1.44",
+    "grpcio-tools>=1.71.0",
     "h5py>=3.13.0",
     "labcore",
     "pandas>=2.2.3",
