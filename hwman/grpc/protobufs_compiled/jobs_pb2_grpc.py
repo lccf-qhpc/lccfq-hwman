@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-from hwman.grpc.protobufs import messages_pb2 as hwman_dot_grpc_dot_protobufs_dot_messages__pb2
+from hwman.grpc.protobufs_compiled import jobs_pb2 as hwman_dot_grpc_dot_protobufs_dot_jobs__pb2
 
 GRPC_GENERATED_VERSION = '1.71.0'
 GRPC_VERSION = grpc.__version__
@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in hwman/grpc/protobufs/messages_pb2_grpc.py depends on'
+        + f' but the generated code in hwman/grpc/protobufs/jobs_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -36,8 +36,8 @@ class JobDispatchStub(object):
         """
         self.SubmitJob = channel.unary_unary(
                 '/JobDispatch/SubmitJob',
-                request_serializer=hwman_dot_grpc_dot_protobufs_dot_messages__pb2.JobRequest.SerializeToString,
-                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_messages__pb2.JobResponse.FromString,
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_jobs__pb2.Job.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_jobs__pb2.Job.FromString,
                 _registered_method=True)
 
 
@@ -55,8 +55,8 @@ def add_JobDispatchServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'SubmitJob': grpc.unary_unary_rpc_method_handler(
                     servicer.SubmitJob,
-                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_messages__pb2.JobRequest.FromString,
-                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_messages__pb2.JobResponse.SerializeToString,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_jobs__pb2.Job.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_jobs__pb2.Job.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -84,8 +84,8 @@ class JobDispatch(object):
             request,
             target,
             '/JobDispatch/SubmitJob',
-            hwman_dot_grpc_dot_protobufs_dot_messages__pb2.JobRequest.SerializeToString,
-            hwman_dot_grpc_dot_protobufs_dot_messages__pb2.JobResponse.FromString,
+            hwman_dot_grpc_dot_protobufs_dot_jobs__pb2.Job.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_jobs__pb2.Job.FromString,
             options,
             channel_credentials,
             insecure,
