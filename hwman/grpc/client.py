@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 import grpc
-from hwman.grpc.protobufs_compiled.jobs_pb2_grpc import JobDispatchStub # type: ignore
+from hwman.grpc.protobufs_compiled.jobs_pb2_grpc import JobDispatchStub  # type: ignore
 from hwman.grpc.protobufs_compiled.jobs_pb2 import Job, JobType  # type: ignore
 
 
