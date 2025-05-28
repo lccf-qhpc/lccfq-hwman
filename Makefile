@@ -16,6 +16,7 @@ protos:
 	  $(PROTO_FILES)
 	@find $(PROTO_OUT_DIR) -type f -name "*.py" -exec mv {} $(PROTO_OUT_DIR) \;
 	@find $(PROTO_OUT_DIR) -type d -not -path "$(PROTO_OUT_DIR)" -exec rm -rf {} +
+	@sed -i '' 's/from hwman.grpc.protobufs import/from hwman.grpc.protobufs_compiled import/g' $(PROTO_OUT_DIR)/*.py
 
 clean:
 	rm -rf $(PROTO_OUT_DIR)/* 
