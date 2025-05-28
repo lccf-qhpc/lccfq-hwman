@@ -334,9 +334,7 @@ class CertificateManager:
             with open(self.ca_cert_file, "rb") as f:
                 ca_cert = x509.load_pem_x509_certificate(f.read())
             with open(self.ca_key_file, "rb") as f:
-                loaded_key = serialization.load_pem_private_key(
-                    f.read(), password=None
-                )
+                loaded_key = serialization.load_pem_private_key(f.read(), password=None)
                 # We know this is an RSA key since we always generate RSA keys
                 assert isinstance(loaded_key, rsa.RSAPrivateKey)
                 ca_private_key = loaded_key
