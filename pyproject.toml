@@ -26,3 +26,33 @@ dev = [
     "mypy>=1.15.0",
     "ruff>=0.11.10",
 ]
+
+[tool.mypy]
+# Ignore missing imports for external libraries and generated protobuf files
+[[tool.mypy.overrides]]
+module = "grpc.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "google.protobuf.*"
+ignore_missing_imports = true
+
+# Handle the protobufs_compiled imports
+[[tool.mypy.overrides]]
+module = "protobufs_compiled.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "hwman.grpc.protobufs_compiled.*"
+ignore_missing_imports = true
+
+[tool.ruff]
+# Exclude directories from ruff linting
+exclude = [
+    "hwman/grpc/protobufs_compiled/",  # Generated protobuf files
+    ".venv/",
+    ".mypy_cache/",
+    ".ruff_cache/",
+    ".git/",
+    ".idea/",
+]
