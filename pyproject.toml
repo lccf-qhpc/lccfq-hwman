@@ -7,7 +7,7 @@ authors = [
     {name = "Marcos Frenkel", email = "marcosf2@illinois.edu"}
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.115.12",
     "gitpython>=3.1.44",

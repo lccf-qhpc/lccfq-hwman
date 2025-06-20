@@ -183,3 +183,7 @@ cython_debug/
 *.crt
 *.key
 *.pem
+
+# Testing data files
+*.tag
+*.ddh5
