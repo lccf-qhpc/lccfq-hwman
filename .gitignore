@@ -178,3 +178,8 @@ cython_debug/
 
 # MacOS Finder files
 .DS_Store
+
+# Certificates storage files
+*.crt
+*.key
+*.pem
