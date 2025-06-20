@@ -16,6 +16,7 @@ dependencies = [
     "labcore",
     "pandas>=2.2.3",
     "xarray>=2025.4.0",
+    "cryptography>=44.0.0",
 ]
 
 [tool.uv.sources]
