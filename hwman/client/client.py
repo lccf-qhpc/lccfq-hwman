@@ -4,7 +4,7 @@ from pathlib import Path
 import grpc
 
 from hwman.grpc.protobufs_compiled.health_pb2_grpc import HealthDispatchStub # type: ignore
-from hwman.grpc.protobufs_compiled.health_pb2 import Ping # type: ignore
+from hwman.grpc.protobufs_compiled.health_pb2 import Ping, InstrumentServerRequest # type: ignore
 from hwman.certificates.certificate_manager import CertificateManager
 
 
@@ -33,6 +33,8 @@ class Client:
         self.ca_cert: bytes | None = None
         self.client_cert: bytes | None = None
         self.client_key: bytes | None = None
+
+        self.health_stub: HealthDispatchStub | None = None
 
         self._initialize_certificates()
 
@@ -94,12 +96,57 @@ class Client:
             f"Secure channel initialized for {self.name} to {self.address}:{self.port}"
         )
 
-    def ping_server(self) -> str | None:
-        stub = HealthDispatchStub(self.channel)
+        self.health_stub = HealthDispatchStub(self.channel)
 
+    def ping_server(self) -> str | None:
         try:
-            response = stub.TestPing(Ping(message="Ping from client"))
+            response = self.health_stub.TestPing(Ping(message="Ping from client"))
             return response.message
         except grpc.RpcError as e:
             logger.error(f"Failed to ping server: {e}")
+            return None
+
+    def check_instrumentserver_status(self) -> str | None:
+        """
+        Check the status of the instrumentserver.
+        This method should be implemented to interact with the instrumentserver.
+        """
+        try:
+            response = self.health_stub.GetInstrumentServerStatus(InstrumentServerRequest())
+            if response.success:
+                return f"Instrumentserver is running: {response.is_running}, Message: {response.message}"
+            else:
+                return f"Instrumentserver is not running, Message: {response.message}"
+        except grpc.RpcError as e:
+            logger.error(f"Failed to check instrumentserver status: {e}")
+            return None
+
+    def start_instrumentserver(self) -> str | None:
+        """
+        Start the instrumentserver.
+        This method should be implemented to interact with the instrumentserver.
+        """
+        try:
+            response = self.health_stub.StartInstrumentServer(InstrumentServerRequest())
+            if response.success:
+                return f"Instrumentserver started successfully: {response.is_running}, Message: {response.message}"
+            else:
+                return f"Failed to start instrumentserver, Message: {response.message}"
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start instrumentserver: {e}")
+            return None
+
+    def stop_instrumentserver(self) -> str | None:
+        """
+        Stop the instrumentserver.
+        This method should be implemented to interact with the instrumentserver.
+        """
+        try:
+            response = self.health_stub.StopInstrumentServer(InstrumentServerRequest())
+            if response.success:
+                return f"Instrumentserver stopped successfully: {response.is_running}, Message: {response.message}"
+            else:
+                return f"Failed to stop instrumentserver, Message: {response.message}"
+        except grpc.RpcError as e:
+            logger.error(f"Failed to stop instrumentserver: {e}")
             return None
