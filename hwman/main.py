@@ -5,7 +5,8 @@ from concurrent import futures
 import grpc
 
 from hwman.certificates.certificate_manager import CertificateManager
-
+from hwman.grpc.protobufs_compiled import health_pb2_grpc
+from hwman.services.health import HealthService
 
 logger = logging.getLogger(__name__)
 
@@ -69,11 +70,14 @@ class Server:
 
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
+        # Add services
+        health_pb2_grpc.add_HealthDispatchServicer_to_server(HealthService(), server)
+
         logger.info("Server instantiated, adding mtls channel.")
 
         server.add_secure_port(f"[::]:{self.port}", server_credentials)
 
-        logger.info(f"Secure port added: {self.address}:{self.port} \n starting server.")
+        logger.info(f"Secure port added: {self.address}:{self.port}. starting server.")
 
         server.start()
 
