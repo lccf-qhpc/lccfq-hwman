@@ -42,7 +42,7 @@ class CertificateManager:
         private_key: rsa.RSAPrivateKey,
         cert_path: Path,
         key_path: Path,
-    ):
+    ) -> None:
         """Save a certificate and its private key to files in PEM format."""
 
         # Serialize certificate to PEM format
