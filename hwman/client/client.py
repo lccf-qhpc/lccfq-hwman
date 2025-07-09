@@ -3,8 +3,8 @@ from pathlib import Path
 
 import grpc
 
-from hwman.grpc.protobufs_compiled.health_pb2_grpc import HealthDispatchStub # type: ignore
-from hwman.grpc.protobufs_compiled.health_pb2 import Ping, InstrumentServerRequest # type: ignore
+from hwman.grpc.protobufs_compiled.health_pb2_grpc import HealthDispatchStub  # type: ignore
+from hwman.grpc.protobufs_compiled.health_pb2 import Ping, InstrumentServerRequest  # type: ignore
 from hwman.certificates.certificate_manager import CertificateManager
 
 
@@ -100,6 +100,7 @@ class Client:
 
     def ping_server(self) -> str | None:
         try:
+            assert self.health_stub is not None, "Health stub is not initialized"
             response = self.health_stub.TestPing(Ping(message="Ping from client"))
             return response.message
         except grpc.RpcError as e:
@@ -112,7 +113,10 @@ class Client:
         This method should be implemented to interact with the instrumentserver.
         """
         try:
-            response = self.health_stub.GetInstrumentServerStatus(InstrumentServerRequest())
+            assert self.health_stub is not None, "Health stub is not initialized"
+            response = self.health_stub.GetInstrumentServerStatus(
+                InstrumentServerRequest()
+            )
             if response.success:
                 return f"Instrumentserver is running: {response.is_running}, Message: {response.message}"
             else:
@@ -127,6 +131,7 @@ class Client:
         This method should be implemented to interact with the instrumentserver.
         """
         try:
+            assert self.health_stub is not None, "Health stub is not initialized"
             response = self.health_stub.StartInstrumentServer(InstrumentServerRequest())
             if response.success:
                 return f"Instrumentserver started successfully: {response.is_running}, Message: {response.message}"
@@ -142,6 +147,7 @@ class Client:
         This method should be implemented to interact with the instrumentserver.
         """
         try:
+            assert self.health_stub is not None, "Health stub is not initialized"
             response = self.health_stub.StopInstrumentServer(InstrumentServerRequest())
             if response.success:
                 return f"Instrumentserver stopped successfully: {response.is_running}, Message: {response.message}"

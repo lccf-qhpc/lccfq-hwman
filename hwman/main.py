@@ -77,7 +77,9 @@ class Server:
 
         # Add services
         self.health_service = HealthService(self.instrumentserver_config_file)
-        health_pb2_grpc.add_HealthDispatchServicer_to_server(self.health_service, server)
+        health_pb2_grpc.add_HealthDispatchServicer_to_server(
+            self.health_service, server
+        )
 
         logger.info("Server instantiated, adding mtls channel.")
 
