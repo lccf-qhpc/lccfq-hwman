@@ -381,7 +381,7 @@ source = { git = "https://github.com/toolsforexperiments/labcore#a003240a9a87a9f
 [[package]]
 name = "lccfq-hwman"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
     { name = "fastapi", extra = ["standard"] },
@@ -390,6 +390,7 @@ dependencies = [
     { name = "h5py" },
     { name = "labcore" },
     { name = "pandas" },
+    { name = "typer" },
     { name = "xarray" },
 ]
 
@@ -408,6 +409,7 @@ requires-dist = [
     { name = "h5py", specifier = ">=3.13.0" },
     { name = "labcore", git = "https://github.com/toolsforexperiments/labcore" },
     { name = "pandas", specifier = ">=2.2.3" },
+    { name = "typer", specifier = ">=0.15.0" },
     { name = "xarray", specifier = ">=2025.4.0" },
 ]
 
