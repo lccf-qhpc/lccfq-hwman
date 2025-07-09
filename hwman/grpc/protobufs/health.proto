@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+
+message Ping {
+  // A simple ping message to check the health of the service.
+  // This message does not carry any data.
+  string message = 1;
+}
+
+message PingResponse {
+  string message = 1;
+}
+
+
+service HealthDispatch {
+  rpc TestPing(Ping) returns (PingResponse);
+}
+
+
+
+
+
+
+
+
+
