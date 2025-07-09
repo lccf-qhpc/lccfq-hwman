@@ -39,12 +39,45 @@ class HealthDispatchStub(object):
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.Ping.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.PingResponse.FromString,
                 _registered_method=True)
+        self.StartInstrumentServer = channel.unary_unary(
+                '/HealthDispatch/StartInstrumentServer',
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+                _registered_method=True)
+        self.StopInstrumentServer = channel.unary_unary(
+                '/HealthDispatch/StopInstrumentServer',
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+                _registered_method=True)
+        self.GetInstrumentServerStatus = channel.unary_unary(
+                '/HealthDispatch/GetInstrumentServerStatus',
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+                _registered_method=True)
 
 
 class HealthDispatchServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def TestPing(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StartInstrumentServer(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StopInstrumentServer(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetInstrumentServerStatus(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -57,6 +90,21 @@ def add_HealthDispatchServicer_to_server(servicer, server):
                     servicer.TestPing,
                     request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.Ping.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.PingResponse.SerializeToString,
+            ),
+            'StartInstrumentServer': grpc.unary_unary_rpc_method_handler(
+                    servicer.StartInstrumentServer,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.SerializeToString,
+            ),
+            'StopInstrumentServer': grpc.unary_unary_rpc_method_handler(
+                    servicer.StopInstrumentServer,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.SerializeToString,
+            ),
+            'GetInstrumentServerStatus': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetInstrumentServerStatus,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -86,6 +134,87 @@ class HealthDispatch(object):
             '/HealthDispatch/TestPing',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.Ping.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.PingResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StartInstrumentServer(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/HealthDispatch/StartInstrumentServer',
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StopInstrumentServer(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/HealthDispatch/StopInstrumentServer',
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetInstrumentServerStatus(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/HealthDispatch/GetInstrumentServerStatus',
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
             channel_credentials,
             insecure,

@@ -11,9 +11,21 @@ message PingResponse {
   string message = 1;
 }
 
+message InstrumentServerRequest {
+  // Empty request message for instrumentserver operations
+}
+
+message InstrumentServerResponse {
+  string message = 1;
+  bool success = 2;
+  bool is_running = 3;
+}
 
 service HealthDispatch {
   rpc TestPing(Ping) returns (PingResponse);
+  rpc StartInstrumentServer(InstrumentServerRequest) returns (InstrumentServerResponse);
+  rpc StopInstrumentServer(InstrumentServerRequest) returns (InstrumentServerResponse);
+  rpc GetInstrumentServerStatus(InstrumentServerRequest) returns (InstrumentServerResponse);
 }
 
 
