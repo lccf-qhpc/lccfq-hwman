@@ -15,9 +15,16 @@ dependencies = [
     "h5py>=3.13.0",
     "labcore",
     "pandas>=2.2.3",
+    "typer>=0.15.0",
     "xarray>=2025.4.0",
     "cryptography>=44.0.0",
 ]
+
+[project.scripts]
+hwman = "hwman.cli:main"
+
+[tool.uv]
+package = true
 
 [tool.uv.sources]
 labcore = { git = "https://github.com/toolsforexperiments/labcore" }
