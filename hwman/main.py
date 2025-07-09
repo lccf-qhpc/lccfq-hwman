@@ -17,16 +17,19 @@ class Server:
         address: str = "localhost",
         port: int = 50001,
         cert_dir: str | Path = "./certs",
+        instrumentserver_config_file: str | Path = "./configs/serverConfig.yml",
     ):
         self.address = address
         self.port = port
         self.cert_dir = Path(cert_dir)
+        self.instrumentserver_config_file = Path(instrumentserver_config_file)
 
         self.server_cert: bytes | None = None
         self.server_key: bytes | None = None
         self.ca_cert: bytes | None = None
 
         self.grpc_server: grpc.Server | None = None
+        self.health_service: HealthService | None = None
 
     def _initialize_certificates(self) -> None:
         logger.info("Initializing certificates...")
@@ -73,7 +76,8 @@ class Server:
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
         # Add services
-        health_pb2_grpc.add_HealthDispatchServicer_to_server(HealthService(), server)
+        self.health_service = HealthService(self.instrumentserver_config_file)
+        health_pb2_grpc.add_HealthDispatchServicer_to_server(self.health_service, server)
 
         logger.info("Server instantiated, adding mtls channel.")
 
@@ -87,4 +91,15 @@ class Server:
             server.wait_for_termination()
         except KeyboardInterrupt:
             logger.info("Server stopped by user.")
-            server.stop(0)
+            self.cleanup()
+
+    def cleanup(self) -> None:
+        """Clean up resources."""
+        logger.info("Cleaning up server resources.")
+        if self.grpc_server:
+            self.grpc_server.stop(0)
+            self.grpc_server = None
+        if self.health_service:
+            self.health_service.cleanup()
+            self.health_service = None
+        logger.info("Server resources cleaned up successfully.")
