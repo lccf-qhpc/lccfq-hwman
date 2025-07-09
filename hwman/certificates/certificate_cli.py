@@ -20,7 +20,7 @@ import logging
 from pathlib import Path
 from datetime import datetime, timezone
 
-from hwman.grpc.certificate_manager import CertificateManager
+from hwman.certificates.certificate_manager import CertificateManager
 from cryptography import x509
 
 logger = logging.getLogger(__name__)
