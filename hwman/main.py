@@ -12,28 +12,31 @@ logger = logging.getLogger(__name__)
 
 
 class Server:
-    def __init__(self, address: str = "localhost", port: int=50001, cert_dir: str | Path = "./certs"):
-
+    def __init__(
+        self,
+        address: str = "localhost",
+        port: int = 50001,
+        cert_dir: str | Path = "./certs",
+    ):
         self.address = address
         self.port = port
         self.cert_dir = Path(cert_dir)
 
-        self.server_cert = None
-        self.server_key = None
-        self.ca_cert = None
+        self.server_cert: bytes | None = None
+        self.server_key: bytes | None = None
+        self.ca_cert: bytes | None = None
 
         self.grpc_server: grpc.Server | None = None
 
-    def _initialize_certificates(self):
-
+    def _initialize_certificates(self) -> None:
         logger.info("Initializing certificates...")
 
         # Initialize certificate manager
         cert_manager = CertificateManager(self.cert_dir)
 
         # Set up CA and server certificates (creates them if they don't exist)
-        ca_cert_file, server_cert_file, server_key_file = cert_manager.setup_ca_and_server(
-            self.address
+        ca_cert_file, server_cert_file, server_key_file = (
+            cert_manager.setup_ca_and_server(self.address)
         )
 
         # Load the certificates for gRPC
@@ -58,8 +61,7 @@ class Server:
 
         logger.info("Certificates initialized successfully.")
 
-    def serve(self):
-
+    def serve(self) -> None:
         logger.info(f"Serving on {self.address}:{self.port}")
 
         server_credentials = grpc.ssl_server_credentials(
@@ -86,22 +88,3 @@ class Server:
         except KeyboardInterrupt:
             logger.info("Server stopped by user.")
             server.stop(0)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

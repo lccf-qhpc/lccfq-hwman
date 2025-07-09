@@ -26,6 +26,11 @@ hwman = "hwman.cli:main"
 [tool.uv]
 package = true
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hwman*"]
+exclude = ["certs*"]
+
 [tool.uv.sources]
 labcore = { git = "https://github.com/toolsforexperiments/labcore" }
 
@@ -36,6 +41,9 @@ dev = [
 ]
 
 [tool.mypy]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
 # Ignore missing imports for external libraries and generated protobuf files
 [[tool.mypy.overrides]]
 module = "grpc.*"
@@ -45,14 +53,14 @@ ignore_missing_imports = true
 module = "google.protobuf.*"
 ignore_missing_imports = true
 
-# Handle the protobufs_compiled imports
+# Ignore all generated protobuf files
 [[tool.mypy.overrides]]
-module = "protobufs_compiled.*"
-ignore_missing_imports = true
+module = "hwman.grpc.*"
+ignore_errors = true
 
 [[tool.mypy.overrides]]
 module = "hwman.grpc.protobufs_compiled.*"
-ignore_missing_imports = true
+ignore_errors = true
 
 [tool.ruff]
 # Exclude directories from ruff linting
