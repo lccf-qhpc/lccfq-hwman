@@ -26,7 +26,7 @@ from cryptography import x509
 logger = logging.getLogger(__name__)
 
 
-def setup_server_certificates(cert_dir: str, hostname: str):
+def setup_server_certificates(cert_dir: str, hostname: str) -> None:
     """
     Set up the server certificate infrastructure.
 
@@ -55,7 +55,7 @@ def setup_server_certificates(cert_dir: str, hostname: str):
     )
 
 
-def create_client_certificate(user_id: str, cert_dir: str):
+def create_client_certificate(user_id: str, cert_dir: str) -> bool:
     """
     Create a client certificate for a specific user.
 
@@ -102,7 +102,7 @@ def create_client_certificate(user_id: str, cert_dir: str):
         return False
 
 
-def list_client_certificates(cert_dir: str):
+def list_client_certificates(cert_dir: str) -> None:
     """List all existing client certificates."""
 
     cert_manager = CertificateManager(Path(cert_dir))
@@ -143,7 +143,7 @@ def list_client_certificates(cert_dir: str):
         print("")
 
 
-def display_certificate_info(cert_file: Path):
+def display_certificate_info(cert_file: Path) -> None:
     """Display detailed information about a certificate."""
 
     try:
@@ -177,7 +177,7 @@ def display_certificate_info(cert_file: Path):
         print(f"Could not read certificate: {e}")
 
 
-def display_server_status(cert_dir: str):
+def display_server_status(cert_dir: str) -> None:
     """Display the status of server certificates."""
 
     cert_manager = CertificateManager(Path(cert_dir))
@@ -212,7 +212,7 @@ def display_server_status(cert_dir: str):
         print("Run setup-server: python -m hwman.grpc.certificate_cli setup-server")
 
 
-def main():
+def main() -> None:
     """Main CLI entry point."""
 
     parser = argparse.ArgumentParser(

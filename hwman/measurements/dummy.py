@@ -12,13 +12,13 @@ Contact: marcosf2@illinois.edu
 
 from random import randint
 
-from labcore.measurement.sweep import sweep_parameter
+from labcore.measurement.sweep import sweep_parameter, Sweep
 from labcore.measurement.record import recording, dependent
 
 
-def generate_dummy_sweep():
+def generate_dummy_sweep() -> Sweep:
     @recording(dependent("dummy_data"))
-    def dummy_data_generator():
+    def dummy_data_generator() -> int:
         return randint(0, 10)
 
     sweep = sweep_parameter("dummy_axis", range(0, 10), dummy_data_generator)
