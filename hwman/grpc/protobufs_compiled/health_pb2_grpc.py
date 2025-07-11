@@ -41,17 +41,32 @@ class HealthDispatchStub(object):
                 _registered_method=True)
         self.StartInstrumentServer = channel.unary_unary(
                 '/HealthDispatch/StartInstrumentServer',
-                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.StopInstrumentServer = channel.unary_unary(
                 '/HealthDispatch/StopInstrumentServer',
-                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.GetInstrumentServerStatus = channel.unary_unary(
                 '/HealthDispatch/GetInstrumentServerStatus',
-                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+                _registered_method=True)
+        self.StartPyroNameserver = channel.unary_unary(
+                '/HealthDispatch/StartPyroNameserver',
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+                _registered_method=True)
+        self.StopPyroNameserver = channel.unary_unary(
+                '/HealthDispatch/StopPyroNameserver',
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+                _registered_method=True)
+        self.GetPyroNameserverStatus = channel.unary_unary(
+                '/HealthDispatch/GetPyroNameserverStatus',
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
 
@@ -83,6 +98,24 @@ class HealthDispatchServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def StartPyroNameserver(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def StopPyroNameserver(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetPyroNameserverStatus(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_HealthDispatchServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -93,17 +126,32 @@ def add_HealthDispatchServicer_to_server(servicer, server):
             ),
             'StartInstrumentServer': grpc.unary_unary_rpc_method_handler(
                     servicer.StartInstrumentServer,
-                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.FromString,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.SerializeToString,
             ),
             'StopInstrumentServer': grpc.unary_unary_rpc_method_handler(
                     servicer.StopInstrumentServer,
-                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.FromString,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.SerializeToString,
             ),
             'GetInstrumentServerStatus': grpc.unary_unary_rpc_method_handler(
                     servicer.GetInstrumentServerStatus,
-                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.FromString,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.SerializeToString,
+            ),
+            'StartPyroNameserver': grpc.unary_unary_rpc_method_handler(
+                    servicer.StartPyroNameserver,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.SerializeToString,
+            ),
+            'StopPyroNameserver': grpc.unary_unary_rpc_method_handler(
+                    servicer.StopPyroNameserver,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.SerializeToString,
+            ),
+            'GetPyroNameserverStatus': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetPyroNameserverStatus,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.SerializeToString,
             ),
     }
@@ -159,7 +207,7 @@ class HealthDispatch(object):
             request,
             target,
             '/HealthDispatch/StartInstrumentServer',
-            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
             channel_credentials,
@@ -186,7 +234,7 @@ class HealthDispatch(object):
             request,
             target,
             '/HealthDispatch/StopInstrumentServer',
-            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
             channel_credentials,
@@ -213,7 +261,88 @@ class HealthDispatch(object):
             request,
             target,
             '/HealthDispatch/GetInstrumentServerStatus',
-            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StartPyroNameserver(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/HealthDispatch/StartPyroNameserver',
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def StopPyroNameserver(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/HealthDispatch/StopPyroNameserver',
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetPyroNameserverStatus(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/HealthDispatch/GetPyroNameserverStatus',
+            hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
             channel_credentials,

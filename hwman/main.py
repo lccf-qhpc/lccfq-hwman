@@ -18,11 +18,13 @@ class Server:
         port: int = 50001,
         cert_dir: str | Path = "./certs",
         instrumentserver_config_file: str | Path = "./configs/serverConfig.yml",
+        start_external_services: bool = True,
     ):
         self.address = address
         self.port = port
         self.cert_dir = Path(cert_dir)
         self.instrumentserver_config_file = Path(instrumentserver_config_file)
+        self.start_external_services = start_external_services
 
         self.server_cert: bytes | None = None
         self.server_key: bytes | None = None
@@ -86,6 +88,14 @@ class Server:
         server.add_secure_port(f"[::]:{self.port}", server_credentials)
 
         logger.info(f"Secure port added: {self.address}:{self.port}. starting server.")
+
+        if self.start_external_services:
+            self.health_service._start_instrumentserver()
+            self.health_service._start_pyro_nameserver()
+
+        logger.info("Starting health check...")
+        all_ok = self.health_service.health_check()
+        logger.info(f"Health check result: {all_ok}")
 
         server.start()
 

@@ -11,7 +11,7 @@ message PingResponse {
   string message = 1;
 }
 
-message InstrumentServerRequest {
+message HealthRequest {
   // Empty request message for instrumentserver operations
 }
 
@@ -23,9 +23,14 @@ message InstrumentServerResponse {
 
 service HealthDispatch {
   rpc TestPing(Ping) returns (PingResponse);
-  rpc StartInstrumentServer(InstrumentServerRequest) returns (InstrumentServerResponse);
-  rpc StopInstrumentServer(InstrumentServerRequest) returns (InstrumentServerResponse);
-  rpc GetInstrumentServerStatus(InstrumentServerRequest) returns (InstrumentServerResponse);
+
+  rpc StartInstrumentServer(HealthRequest) returns (InstrumentServerResponse);
+  rpc StopInstrumentServer(HealthRequest) returns (InstrumentServerResponse);
+  rpc GetInstrumentServerStatus(HealthRequest) returns (InstrumentServerResponse);
+
+  rpc StartPyroNameserver(HealthRequest) returns (InstrumentServerResponse);
+  rpc StopPyroNameserver(HealthRequest) returns (InstrumentServerResponse);
+  rpc GetPyroNameserverStatus(HealthRequest) returns (InstrumentServerResponse);
 }
 
 
