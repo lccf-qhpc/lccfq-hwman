@@ -11,6 +11,7 @@ from hwman.services.health import HealthService
 logger = logging.getLogger(__name__)
 
 
+# FIXME: The default values for these should be with their respective services, not in the main server class.
 class Server:
     def __init__(
         self,
@@ -18,12 +19,18 @@ class Server:
         port: int = 50001,
         cert_dir: str | Path = "./certs",
         instrumentserver_config_file: str | Path = "./configs/serverConfig.yml",
+        proxy_ns_name: str = "rfsoc",
+        ns_host: str = "localhost",
+        ns_port: int = 8888,
         start_external_services: bool = True,
     ):
         self.address = address
         self.port = port
         self.cert_dir = Path(cert_dir)
         self.instrumentserver_config_file = Path(instrumentserver_config_file)
+        self.proxy_ns_name = proxy_ns_name
+        self.ns_host = ns_host
+        self.ns_port = ns_port
         self.start_external_services = start_external_services
 
         self.server_cert: bytes | None = None
@@ -78,7 +85,12 @@ class Server:
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
         # Add services
-        self.health_service = HealthService(self.instrumentserver_config_file)
+        self.health_service = HealthService(
+            self.instrumentserver_config_file,
+            self.proxy_ns_name,
+            self.ns_host,
+            self.ns_port,
+        )
         health_pb2_grpc.add_HealthDispatchServicer_to_server(
             self.health_service, server
         )

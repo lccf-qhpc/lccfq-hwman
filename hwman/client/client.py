@@ -114,9 +114,7 @@ class Client:
         """
         try:
             assert self.health_stub is not None, "Health stub is not initialized"
-            response = self.health_stub.GetInstrumentServerStatus(
-                HealthRequest()
-            )
+            response = self.health_stub.GetInstrumentServerStatus(HealthRequest())
             if response.success:
                 return f"Instrumentserver is running: {response.is_running}, Message: {response.message}"
             else:
@@ -196,9 +194,7 @@ class Client:
         """
         try:
             assert self.health_stub is not None, "Health stub is not initialized"
-            response = self.health_stub.GetPyroNameserverStatus(
-                HealthRequest()
-            )
+            response = self.health_stub.GetPyroNameserverStatus(HealthRequest())
             if response.success:
                 return f"Nameserver is running: {response.is_running}, Message: {response.message}"
             else:

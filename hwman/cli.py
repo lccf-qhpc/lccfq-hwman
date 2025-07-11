@@ -37,6 +37,21 @@ def start(
     log_level: Annotated[
         str, typer.Option("--log-level", help="Set logging level", case_sensitive=False)
     ] = "INFO",
+    instrumentserver_config_file: Annotated[
+        str, typer.Option("-c", help="Path to instrumentserver config file")
+    ] = "./configs/serverConfig.yml",
+    proxy_ns_name: Annotated[
+        str, typer.Option("-pn", help="Name of the Pyro nameserver proxy")
+    ] = "rfsoc",
+    ns_host: Annotated[
+        str, typer.Option("-nh", help="Host of the Pyro nameserver")
+    ] = "localhost",
+    ns_port: Annotated[
+        int, typer.Option("-np", help="Port of the Pyro nameserver")
+    ] = 8888,
+    start_external_services: Annotated[
+        bool, typer.Option("-se", help="Start external services")
+    ] = True,
 ) -> None:
     """Start the hardware management server."""
 
@@ -63,7 +78,16 @@ def start(
 
     try:
         # Initialize server
-        server = Server(address=address, port=port, cert_dir=cert_dir)
+        server = Server(
+            address=address,
+            port=port,
+            cert_dir=cert_dir,
+            instrumentserver_config_file=instrumentserver_config_file,
+            proxy_ns_name=proxy_ns_name,
+            ns_host=ns_host,
+            ns_port=ns_port,
+            start_external_services=start_external_services,
+        )
 
         # Initialize certificates
         server._initialize_certificates()

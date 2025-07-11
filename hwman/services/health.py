@@ -50,7 +50,7 @@ class HealthService(Service, HealthDispatchServicer):
         self.pyro_nameserver_process: subprocess.Popen | None = None
 
         super().__init__(*args, **kwargs)
-        
+
     def cleanup(self) -> None:
         """Clean up the instrumentserver and Pyro nameserver processes if they are running."""
         if (
@@ -64,14 +64,17 @@ class HealthService(Service, HealthDispatchServicer):
             logger.info("Cleaning up Pyro nameserver...")
             self._stop_pyro_nameserver()
         logger.info("HealthService cleanup completed.")
-    
+
     def health_check(self) -> bool:
         """Check the health of the instrumentserver and Pyro nameserver."""
-        instrumentserver_status, instrumentserver_message = self._get_instrumentserver_status()
-        pyro_nameserver_status, pyro_nameserver_message = self._get_pyro_nameserver_status()
+        instrumentserver_status, instrumentserver_message = (
+            self._get_instrumentserver_status()
+        )
+        pyro_nameserver_status, pyro_nameserver_message = (
+            self._get_pyro_nameserver_status()
+        )
         all_ok = instrumentserver_status and pyro_nameserver_status
         return all_ok
-        
 
     def TestPing(self, request: Ping, context: grpc.ServicerContext) -> PingResponse:
         """
