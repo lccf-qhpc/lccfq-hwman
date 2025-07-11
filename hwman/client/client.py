@@ -4,7 +4,7 @@ from pathlib import Path
 import grpc
 
 from hwman.grpc.protobufs_compiled.health_pb2_grpc import HealthDispatchStub  # type: ignore
-from hwman.grpc.protobufs_compiled.health_pb2 import Ping, InstrumentServerRequest  # type: ignore
+from hwman.grpc.protobufs_compiled.health_pb2 import Ping, HealthRequest  # type: ignore
 from hwman.certificates.certificate_manager import CertificateManager
 
 
@@ -115,7 +115,7 @@ class Client:
         try:
             assert self.health_stub is not None, "Health stub is not initialized"
             response = self.health_stub.GetInstrumentServerStatus(
-                InstrumentServerRequest()
+                HealthRequest()
             )
             if response.success:
                 return f"Instrumentserver is running: {response.is_running}, Message: {response.message}"
@@ -132,7 +132,7 @@ class Client:
         """
         try:
             assert self.health_stub is not None, "Health stub is not initialized"
-            response = self.health_stub.StartInstrumentServer(InstrumentServerRequest())
+            response = self.health_stub.StartInstrumentServer(HealthRequest())
             if response.success:
                 return f"Instrumentserver started successfully: {response.is_running}, Message: {response.message}"
             else:
@@ -148,11 +148,61 @@ class Client:
         """
         try:
             assert self.health_stub is not None, "Health stub is not initialized"
-            response = self.health_stub.StopInstrumentServer(InstrumentServerRequest())
+            response = self.health_stub.StopInstrumentServer(HealthRequest())
             if response.success:
                 return f"Instrumentserver stopped successfully: {response.is_running}, Message: {response.message}"
             else:
                 return f"Failed to stop instrumentserver, Message: {response.message}"
         except grpc.RpcError as e:
             logger.error(f"Failed to stop instrumentserver: {e}")
+            return None
+
+    def start_nameserver(self) -> str | None:
+        """
+        Start the nameserver.
+        This method should be implemented to interact with the nameserver.
+        """
+        try:
+            assert self.health_stub is not None, "Health stub is not initialized"
+            response = self.health_stub.StartPyroNameserver(HealthRequest())
+            if response.success:
+                return f"Nameserver started successfully: {response.is_running}, Message: {response.message}"
+            else:
+                return f"Failed to start nameserver, Message: {response.message}"
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start nameserver: {e}")
+            return None
+
+    def stop_nameserver(self) -> str | None:
+        """
+        Stop the nameserver.
+        This method should be implemented to interact with the nameserver.
+        """
+        try:
+            assert self.health_stub is not None, "Health stub is not initialized"
+            response = self.health_stub.StopPyroNameserver(HealthRequest())
+            if response.success:
+                return f"Nameserver stopped successfully: {response.is_running}, Message: {response.message}"
+            else:
+                return f"Failed to stop nameserver, Message: {response.message}"
+        except grpc.RpcError as e:
+            logger.error(f"Failed to stop nameserver: {e}")
+            return None
+
+    def check_nameserver_status(self) -> str | None:
+        """
+        Check the status of the nameserver.
+        This method should be implemented to interact with the nameserver.
+        """
+        try:
+            assert self.health_stub is not None, "Health stub is not initialized"
+            response = self.health_stub.GetPyroNameserverStatus(
+                HealthRequest()
+            )
+            if response.success:
+                return f"Nameserver is running: {response.is_running}, Message: {response.message}"
+            else:
+                return f"Nameserver is not running, Message: {response.message}"
+        except grpc.RpcError as e:
+            logger.error(f"Failed to check nameserver status: {e}")
             return None

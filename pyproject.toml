@@ -23,6 +23,7 @@ dependencies = [
     "qcodes>=0.53.0",
     "pyqt5>=5.15.11",
     "instrumentserver",
+    "pyro4>=4.82",
 ]
 
 [project.scripts]
