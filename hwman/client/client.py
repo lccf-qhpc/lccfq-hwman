@@ -3,8 +3,10 @@ from pathlib import Path
 
 import grpc
 
-from hwman.grpc.protobufs_compiled.health_pb2_grpc import HealthDispatchStub  # type: ignore
+from hwman.grpc.protobufs_compiled.health_pb2_grpc import HealthStub  # type: ignore
 from hwman.grpc.protobufs_compiled.health_pb2 import Ping, HealthRequest  # type: ignore
+from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestStub  # type: ignore
+from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType  # type: ignore
 from hwman.certificates.certificate_manager import CertificateManager
 
 
@@ -34,7 +36,8 @@ class Client:
         self.client_cert: bytes | None = None
         self.client_key: bytes | None = None
 
-        self.health_stub: HealthDispatchStub | None = None
+        self.health_stub: HealthStub | None = None
+        self.test_stub: TestStub | None = None
 
         self._initialize_certificates()
 
@@ -96,7 +99,8 @@ class Client:
             f"Secure channel initialized for {self.name} to {self.address}:{self.port}"
         )
 
-        self.health_stub = HealthDispatchStub(self.channel)
+        self.health_stub = HealthStub(self.channel)
+        self.test_stub = TestStub(self.channel)
 
     def ping_server(self) -> str | None:
         try:
@@ -201,4 +205,24 @@ class Client:
                 return f"Nameserver is not running, Message: {response.message}"
         except grpc.RpcError as e:
             logger.error(f"Failed to check nameserver status: {e}")
+            return None
+
+    def start_test(self, test_type: TestType, pid: str) -> str | None:
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            response = self.test_stub.StandardTest(
+                TestRequest(test_type=test_type, pid=pid)
+            )
+            return None
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start test: {e}")
+            return None
+
+    def start(self) -> str | None:
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            response = self.test_stub.start(TestRequest())
+            return None
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start test: {e}")
             return None

@@ -9,7 +9,6 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi[standard]>=0.115.12",
     "gitpython>=3.1.44",
     "grpcio-tools>=1.71.0",
     "h5py>=3.13.0",
@@ -24,6 +23,9 @@ dependencies = [
     "pyqt5>=5.15.11",
     "instrumentserver",
     "pyro4>=4.82",
+    "python-dotenv>=1.1.0",
+    "qcui_measurement",
+    "qick"
 ]
 
 [project.scripts]
@@ -39,7 +41,9 @@ exclude = ["certs*"]
 
 [tool.uv.sources]
 labcore = { git = "https://github.com/toolsforexperiments/labcore" }
-instrumentserver = { path = "../../instrumentserver", editable = true }
+instrumentserver = { path = "../instrumentserver", editable = true }
+qcui_measurement = { path = "../measurement", editable = true }
+qick = { path = "../qick", editable = true }
 
 [dependency-groups]
 dev = [

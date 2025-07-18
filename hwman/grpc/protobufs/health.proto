@@ -21,7 +21,7 @@ message InstrumentServerResponse {
   bool is_running = 3;
 }
 
-service HealthDispatch {
+service Health {
   rpc TestPing(Ping) returns (PingResponse);
 
   rpc StartInstrumentServer(HealthRequest) returns (InstrumentServerResponse);
