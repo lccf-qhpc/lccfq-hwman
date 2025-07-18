@@ -25,7 +25,7 @@ if _version_not_supported:
     )
 
 
-class HealthDispatchStub(object):
+class HealthStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -35,43 +35,43 @@ class HealthDispatchStub(object):
             channel: A grpc.Channel.
         """
         self.TestPing = channel.unary_unary(
-                '/HealthDispatch/TestPing',
+                '/Health/TestPing',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.Ping.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.PingResponse.FromString,
                 _registered_method=True)
         self.StartInstrumentServer = channel.unary_unary(
-                '/HealthDispatch/StartInstrumentServer',
+                '/Health/StartInstrumentServer',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.StopInstrumentServer = channel.unary_unary(
-                '/HealthDispatch/StopInstrumentServer',
+                '/Health/StopInstrumentServer',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.GetInstrumentServerStatus = channel.unary_unary(
-                '/HealthDispatch/GetInstrumentServerStatus',
+                '/Health/GetInstrumentServerStatus',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.StartPyroNameserver = channel.unary_unary(
-                '/HealthDispatch/StartPyroNameserver',
+                '/Health/StartPyroNameserver',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.StopPyroNameserver = channel.unary_unary(
-                '/HealthDispatch/StopPyroNameserver',
+                '/Health/StopPyroNameserver',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.GetPyroNameserverStatus = channel.unary_unary(
-                '/HealthDispatch/GetPyroNameserverStatus',
+                '/Health/GetPyroNameserverStatus',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
 
 
-class HealthDispatchServicer(object):
+class HealthServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def TestPing(self, request, context):
@@ -117,7 +117,7 @@ class HealthDispatchServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_HealthDispatchServicer_to_server(servicer, server):
+def add_HealthServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'TestPing': grpc.unary_unary_rpc_method_handler(
                     servicer.TestPing,
@@ -156,13 +156,13 @@ def add_HealthDispatchServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'HealthDispatch', rpc_method_handlers)
+            'Health', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('HealthDispatch', rpc_method_handlers)
+    server.add_registered_method_handlers('Health', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class HealthDispatch(object):
+class Health(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
@@ -179,7 +179,7 @@ class HealthDispatch(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/HealthDispatch/TestPing',
+            '/Health/TestPing',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.Ping.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.PingResponse.FromString,
             options,
@@ -206,7 +206,7 @@ class HealthDispatch(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/HealthDispatch/StartInstrumentServer',
+            '/Health/StartInstrumentServer',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
@@ -233,7 +233,7 @@ class HealthDispatch(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/HealthDispatch/StopInstrumentServer',
+            '/Health/StopInstrumentServer',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
@@ -260,7 +260,7 @@ class HealthDispatch(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/HealthDispatch/GetInstrumentServerStatus',
+            '/Health/GetInstrumentServerStatus',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
@@ -287,7 +287,7 @@ class HealthDispatch(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/HealthDispatch/StartPyroNameserver',
+            '/Health/StartPyroNameserver',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
@@ -314,7 +314,7 @@ class HealthDispatch(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/HealthDispatch/StopPyroNameserver',
+            '/Health/StopPyroNameserver',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
@@ -341,7 +341,7 @@ class HealthDispatch(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/HealthDispatch/GetPyroNameserverStatus',
+            '/Health/GetPyroNameserverStatus',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,

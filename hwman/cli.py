@@ -4,9 +4,11 @@ Main CLI for the Hardware Management (hwman) tool.
 """
 
 import logging
+from pathlib import Path
 from typing import Annotated
 
 import typer
+from dotenv import load_dotenv
 
 from hwman.main import Server
 
@@ -28,9 +30,9 @@ def setup_logging(log_level: str = "INFO") -> None:
 @app.command()
 def start(
     address: Annotated[
-        str, typer.Option(help="Server address to bind to")
+        str, typer.Option("--address", help="Server address to bind to")
     ] = "localhost",
-    port: Annotated[int, typer.Option(help="Server port to bind to")] = 50001,
+    port: Annotated[int, typer.Option("--port", help="Server port to bind to")] = 50001,
     cert_dir: Annotated[
         str, typer.Option("--cert-dir", help="Directory for certificates")
     ] = "./certs",
@@ -54,6 +56,12 @@ def start(
     ] = True,
 ) -> None:
     """Start the hardware management server."""
+
+    # Load environment variables from .env file if it exists
+    env_file = Path.cwd() / ".env"
+    if env_file.exists():
+        load_dotenv(env_file)
+        print(f"Loaded environment variables from {env_file}")
 
     # Validate log level
     valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
@@ -100,6 +108,7 @@ def start(
         raise typer.Exit(0)
     except Exception as e:
         logger.error(f"Server failed to start: {e}")
+        logger.exception("Full traceback:")
         raise typer.Exit(1)
 
 

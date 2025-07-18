@@ -1,8 +1,5 @@
 instruments:
-  dummy_instrument_random_number:
-    type: instrumentserver.testing.dummy_instruments.generic.DummyInstrumentRandomNumber
-    initialize: True
-  parameter_manager2:
+  parameter_manager:
     type: instrumentserver.params.ParameterManager
     initialize: True
     gui:

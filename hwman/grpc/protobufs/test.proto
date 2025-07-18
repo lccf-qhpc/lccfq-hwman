@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+
+enum TestType {
+    ADC_TRIGGER_CALIBRATION = 0;
+    RESONATOR_SPEC = 1;
+    PULSE_PROBE_SPECTROSCOPY = 2;
+    POWER_RABI = 3;
+    PI_SPEC = 4;
+    RESONATOR_SPEC_AFTER_PI = 5;
+    T1 = 6;
+    T2R = 7;
+    T2E = 8;
+    STATE_ASSIGNMENT = 9;
+}
+
+message DataAxis {
+    string name = 1;
+    repeated float values = 2;
+    repeated string depends_on = 3;
+}
+
+message TestRequest {
+    string pid = 1;   
+    TestType test_type = 2;
+    int32 shots = 3;
+    bool return_full_data = 4;
+}
+
+message TestResponse {
+    string pid = 1;
+    bool status = 2;
+    string data_path = 3;
+    // repeated DataAxis data = 4;
+}
+
+
+service Test {
+    rpc StandardTest(TestRequest) returns (TestResponse);
+    rpc start(TestRequest) returns (TestResponse);
+}
+
+
