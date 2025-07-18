@@ -218,11 +218,3 @@ class Client:
             logger.error(f"Failed to start test: {e}")
             return None
 
-    def start(self) -> str | None:
-        try:
-            assert self.test_stub is not None, "Test stub is not initialized"
-            response = self.test_stub.start(TestRequest())
-            return None
-        except grpc.RpcError as e:
-            logger.error(f"Failed to start test: {e}")
-            return None

@@ -100,11 +100,11 @@ class Server:
             self.health_service._start_instrumentserver()
             self.health_service._start_pyro_nameserver()
             self.health_service._start_qick_server()
-            time.sleep(1)
 
         logger.info("Initializing test service...")
         self.test_service = TestService(self.data_dir)
         test_pb2_grpc.add_TestServicer_to_server(self.test_service, self.server)
+        self.test_service._start()
 
         logger.info("Services initialized successfully.")
 
