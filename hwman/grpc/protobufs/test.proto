@@ -37,7 +37,6 @@ message TestResponse {
 
 service Test {
     rpc StandardTest(TestRequest) returns (TestResponse);
-    rpc start(TestRequest) returns (TestResponse);
 }
 
 

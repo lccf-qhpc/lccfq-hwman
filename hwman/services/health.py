@@ -4,6 +4,7 @@ import os
 from typing import Any
 import subprocess
 from pathlib import Path
+import time
 
 import grpc
 
@@ -394,7 +395,7 @@ class HealthService(Service, HealthServicer):
             if self.qick_server_process.stdin:
                 self.qick_server_process.stdin.write(f"{os.environ['QICK_PASSWORD']}\n")
                 self.qick_server_process.stdin.flush()
-
+            time.sleep(20)
             logger.info("Qick server started successfully")
             return True, f"Qick server started with PID: {self.qick_server_process.pid}"
 
