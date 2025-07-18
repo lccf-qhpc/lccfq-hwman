@@ -4,8 +4,7 @@ Basic config for the physical setup. This should be moved into a more formal pla
 
 import logging
 import os
-from pathlib import Path
-from functools import partial
+from typing import Any
 
 from instrumentserver.client import Client
 
@@ -22,7 +21,7 @@ params = find_or_create_remote_instrument(instruments, "parameter_manager")
 
 
 class QickConfig(QBoardConfig):
-    def config_(self):
+    def config_(self) -> dict[str, Any]:
         params = self.params
 
         cfg = {
@@ -82,4 +81,4 @@ conf = QickConfig(
     nameserver_host=os.environ["NAMESERVER_HOST"],
     nameserver_name="rfsoc",
 )
-qick_sweep_v2.config = conf
+qick_sweep_v2.config = conf  # type: ignore[assignment]

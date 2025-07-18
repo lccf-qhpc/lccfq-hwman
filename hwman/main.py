@@ -1,5 +1,4 @@
 import logging
-import time
 from pathlib import Path
 from concurrent import futures
 
@@ -133,6 +132,7 @@ class Server:
             self._initialize_services()
 
             logger.info("Starting health check...")
+            assert self.health_service is not None, "Health service is not initialized"
             all_ok = self.health_service.health_check()
             logger.info(f"Health check result: {all_ok}")
 

@@ -55,6 +55,7 @@ dev = [
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
+ignore_missing_imports = true
 # Ignore missing imports for external libraries and generated protobuf files
 [[tool.mypy.overrides]]
 module = "grpc.*"

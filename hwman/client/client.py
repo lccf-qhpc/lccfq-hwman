@@ -6,7 +6,7 @@ import grpc
 from hwman.grpc.protobufs_compiled.health_pb2_grpc import HealthStub  # type: ignore
 from hwman.grpc.protobufs_compiled.health_pb2 import Ping, HealthRequest  # type: ignore
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestStub  # type: ignore
-from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType  # type: ignore
+from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestType  # type: ignore
 from hwman.certificates.certificate_manager import CertificateManager
 
 
@@ -210,11 +210,10 @@ class Client:
     def start_test(self, test_type: TestType, pid: str) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
-            response = self.test_stub.StandardTest(
+            self.test_stub.StandardTest(
                 TestRequest(test_type=test_type, pid=pid)
             )
             return None
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
             return None
-

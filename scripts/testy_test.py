@@ -3,7 +3,7 @@ from hwman.client import Client, TestType
 
 from instrumentserver.client.proxy import Client as cl
 
-
+c = Client(address="")
 
 ins_c = cl()
 params = ins_c.get_instrument("parameter_manager")
