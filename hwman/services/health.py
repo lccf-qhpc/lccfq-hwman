@@ -20,6 +20,9 @@ from hwman.grpc.protobufs_compiled.health_pb2 import (  # type: ignore
 from hwman.services import Service
 
 logger = logging.getLogger(__name__)
+instrumentserver_logger = logging.getLogger(f"{__name__}.instrumentserver")
+pyro_nameserver_logger = logging.getLogger(f"{__name__}.pyro_nameserver") 
+qick_server_logger = logging.getLogger(f"{__name__}.qick_server")
 
 
 class HealthService(Service, HealthServicer):
@@ -125,20 +128,20 @@ class HealthService(Service, HealthServicer):
                 start_new_session=True,  # Create subprocess in new session to avoid threading issues
                 text=True,
             )
-            logger.info(
+            instrumentserver_logger.info(
                 f"Started instrumentserver with PID: {self.instrumentserver_process.pid}"
             )
 
             # Loading parameters
             instrument_client = ins_c()
             params = instrument_client.get_instrument("parameter_manager")
-            logger.info(f"Loading parameters from {self.instrumentserver_params_file}")
+            instrumentserver_logger.info(f"Loading parameters from {self.instrumentserver_params_file}")
             params.fromFile(self.instrumentserver_params_file)
-            logger.info("Testing parameters loaded successfully")
+            instrumentserver_logger.info("Testing parameters loaded successfully")
             if params.qubit.f_ge() is not None:
-                logger.info(f"Qubit frequency: {params.qubit.f_ge()}")
+                instrumentserver_logger.info(f"Qubit frequency: {params.qubit.f_ge()}")
             else:
-                logger.error("Qubit frequency is None")
+                instrumentserver_logger.error("Qubit frequency is None")
                 return False, "Qubit frequency is None"
 
             return (
@@ -146,7 +149,7 @@ class HealthService(Service, HealthServicer):
                 f"Instrumentserver started with PID: {self.instrumentserver_process.pid}",
             )
         except Exception as e:
-            logger.error(f"Failed to start instrumentserver: {e}")
+            instrumentserver_logger.error(f"Failed to start instrumentserver: {e}")
             return False, f"Failed to start instrumentserver: {e}"
 
     def _stop_instrumentserver(self) -> tuple[bool, str]:
@@ -160,14 +163,14 @@ class HealthService(Service, HealthServicer):
         try:
             self.instrumentserver_process.terminate()
             self.instrumentserver_process.wait(timeout=5)
-            logger.info("Instrumentserver stopped successfully")
+            instrumentserver_logger.info("Instrumentserver stopped successfully")
             return True, "Instrumentserver stopped successfully"
         except subprocess.TimeoutExpired:
-            logger.warning("Instrumentserver did not terminate gracefully, killing it")
+            instrumentserver_logger.warning("Instrumentserver did not terminate gracefully, killing it")
             self.instrumentserver_process.kill()
             return True, "Instrumentserver killed (did not terminate gracefully)"
         except Exception as e:
-            logger.error(f"Failed to stop instrumentserver: {e}")
+            instrumentserver_logger.error(f"Failed to stop instrumentserver: {e}")
             return False, f"Failed to stop instrumentserver: {e}"
 
     def _get_instrumentserver_status(self) -> tuple[bool, str]:
@@ -242,7 +245,7 @@ class HealthService(Service, HealthServicer):
         return response
 
     def _start_pyro_nameserver(self) -> tuple[bool, str]:
-        logger.info("Starting Pyro nameserver...")
+        pyro_nameserver_logger.info("Starting Pyro nameserver...")
         if self.pyro_nameserver_process and self.pyro_nameserver_process.poll() is None:
             return False, "Instrumentserver is already running"
 
@@ -265,14 +268,14 @@ class HealthService(Service, HealthServicer):
                 text=True,
             )
 
-            logger.info("Pyro nameserver started successfully.")
+            pyro_nameserver_logger.info("Pyro nameserver started successfully.")
             return True, "Pyro nameserver started successfully."
         except Exception as e:
-            logger.error(f"Failed to start Pyro nameserver: {e}")
+            pyro_nameserver_logger.error(f"Failed to start Pyro nameserver: {e}")
             return False, f"Failed to start Pyro nameserver: {e}"
 
     def _stop_pyro_nameserver(self) -> tuple[bool, str]:
-        logger.info("Stopping Pyro nameserver...")
+        pyro_nameserver_logger.info("Stopping Pyro nameserver...")
 
         if (
             not self.pyro_nameserver_process
@@ -283,14 +286,14 @@ class HealthService(Service, HealthServicer):
         try:
             self.pyro_nameserver_process.terminate()
             self.pyro_nameserver_process.wait(timeout=5)
-            logger.info("Pyro nameserver stopped successfully.")
+            pyro_nameserver_logger.info("Pyro nameserver stopped successfully.")
             return True, "Pyro nameserver stopped successfully."
         except subprocess.TimeoutExpired:
-            logger.warning("Pyro nameserver did not terminate gracefully, killing it.")
+            pyro_nameserver_logger.warning("Pyro nameserver did not terminate gracefully, killing it.")
             self.pyro_nameserver_process.kill()
             return True, "Pyro nameserver killed (did not terminate gracefully)."
         except Exception as e:
-            logger.error(f"Failed to stop Pyro nameserver: {e}")
+            pyro_nameserver_logger.error(f"Failed to stop Pyro nameserver: {e}")
             return False, f"Failed to stop Pyro nameserver: {e}"
 
     def _get_pyro_nameserver_status(self) -> tuple[bool, str]:
@@ -364,7 +367,7 @@ class HealthService(Service, HealthServicer):
 
     def _start_qick_server(self) -> tuple[bool, str]:
         """Start the qick server via SSH to qick_board."""
-        logger.info("Starting qick server...")
+        qick_server_logger.info("Starting qick server...")
         if self.qick_server_process and self.qick_server_process.poll() is None:
             return False, "Qick server is already running"
 
@@ -395,22 +398,22 @@ class HealthService(Service, HealthServicer):
                 self.qick_server_process.stdin.write(f"{os.environ['QICK_PASSWORD']}\n")
                 self.qick_server_process.stdin.flush()
             time.sleep(20)
-            logger.info("Qick server started successfully")
+            qick_server_logger.info("Qick server started successfully")
             return True, f"Qick server started with PID: {self.qick_server_process.pid}"
 
         except Exception as e:
-            logger.error(f"Failed to start qick server: {e}")
+            qick_server_logger.error(f"Failed to start qick server: {e}")
             return False, f"Failed to start qick server: {e}"
 
     def _stop_qick_server(self) -> tuple[bool, str]:
         """Stop the qick server subprocess."""
-        logger.info("Stopping qick server...")
+        qick_server_logger.info("Stopping qick server...")
         if not self.qick_server_process or self.qick_server_process.poll() is not None:
             return False, "Qick server is not running"
 
         try:
             # First, kill the remote pyro_service.py processes via SSH
-            logger.info("Attempting to kill remote pyro_service.py processes...")
+            qick_server_logger.info("Attempting to kill remote pyro_service.py processes...")
 
             kill_cmd = [
                 "ssh",
@@ -423,7 +426,7 @@ class HealthService(Service, HealthServicer):
             )
 
             stdout, stderr = kill_process.communicate(timeout=10)
-            logger.info(
+            qick_server_logger.info(
                 f"Remote kill command completed with return code: {kill_process.returncode}"
             )
 
@@ -431,15 +434,15 @@ class HealthService(Service, HealthServicer):
             self.qick_server_process.terminate()
             self.qick_server_process.wait(timeout=5)
 
-            logger.info("Qick server stopped successfully")
+            qick_server_logger.info("Qick server stopped successfully")
             return True, "Qick server stopped successfully"
 
         except subprocess.TimeoutExpired:
-            logger.warning("Qick server did not terminate gracefully, killing it")
+            qick_server_logger.warning("Qick server did not terminate gracefully, killing it")
 
             # Force kill the remote processes
             try:
-                logger.info(
+                qick_server_logger.info(
                     "Attempting force kill of remote pyro_service.py processes..."
                 )
                 force_kill_cmd = [
@@ -456,10 +459,10 @@ class HealthService(Service, HealthServicer):
                 )
 
                 force_kill_process.communicate(timeout=5)
-                logger.info("Force kill of remote processes completed")
+                qick_server_logger.info("Force kill of remote processes completed")
 
             except Exception as force_kill_error:
-                logger.error(
+                qick_server_logger.error(
                     f"Failed to force kill remote processes: {force_kill_error}"
                 )
 
@@ -467,7 +470,7 @@ class HealthService(Service, HealthServicer):
             self.qick_server_process.kill()
             return True, "Qick server killed (did not terminate gracefully)"
         except Exception as e:
-            logger.error(f"Failed to stop qick server: {e}")
+            qick_server_logger.error(f"Failed to stop qick server: {e}")
             return False, f"Failed to stop qick server: {e}"
 
     def _get_qick_server_status(self) -> tuple[bool, str]:

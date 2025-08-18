@@ -3,7 +3,9 @@
 Main CLI for the Hardware Management (hwman) tool.
 """
 
+import copy
 import logging
+import sys
 from pathlib import Path
 from typing import Annotated
 
@@ -18,12 +20,76 @@ app = typer.Typer(
 )
 
 
+class ColoredFormatter(logging.Formatter):
+    """Custom formatter that adds colors based on logger name and level."""
+    
+    # ANSI color codes
+    COLORS = {
+        'DEBUG': '\033[36m',    # Cyan
+        'INFO': '\033[32m',     # Green  
+        'WARNING': '\033[33m',  # Yellow
+        'ERROR': '\033[31m',    # Red
+        'CRITICAL': '\033[35m', # Magenta
+    }
+    
+    # Service-specific colors (for logger names)
+    SERVICE_COLORS = {
+        'hwman.main': '\033[94m',                          # Blue
+        'hwman.services.health': '\033[92m',               # Light Green
+        'hwman.services.health.instrumentserver': '\033[95m',  # Light Magenta
+        'hwman.services.health.pyro_nameserver': '\033[91m',   # Light Red  
+        'hwman.services.health.qick_server': '\033[97m',       # White
+        'hwman.services.tests': '\033[96m',                # Light Cyan
+        'hwman.certificates': '\033[93m',                  # Light Yellow
+    }
+    
+    RESET = '\033[0m'  # Reset color
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Check if output is a terminal
+        self.use_colors = hasattr(sys.stderr, 'isatty') and sys.stderr.isatty()
+
+    def format(self, record):
+        if not self.use_colors:
+            return super().format(record)
+        
+        # Create a copy of the record to avoid mutating the original
+        record_copy = copy.copy(record)
+        
+        # Get color for service (logger name)
+        service_color = self.SERVICE_COLORS.get(record_copy.name, '')
+        
+        # Get color for log level
+        level_color = self.COLORS.get(record_copy.levelname, '')
+        
+        # Apply colors to specific parts
+        if service_color:
+            record_copy.name = f"{service_color}{record_copy.name}{self.RESET}"
+        if level_color:
+            record_copy.levelname = f"{level_color}{record_copy.levelname}{self.RESET}"
+            
+        return super().format(record_copy)
+
+
 def setup_logging(log_level: str = "INFO") -> None:
     """Configure logging for the application."""
+    
+    # Create formatter
+    formatter = ColoredFormatter(
+        fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    
+    # Setup handler
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    
+    # Configure root logger
     logging.basicConfig(
         level=getattr(logging, log_level.upper()),
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
+        handlers=[handler],
+        force=True  # Override any existing configuration
     )
 
 
