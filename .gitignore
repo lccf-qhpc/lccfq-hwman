@@ -187,3 +187,9 @@ cython_debug/
 # Testing data files
 *.tag
 *.ddh5
+
+# ai agents
+GEMINI.md
+
+*/data/*
+*.json
