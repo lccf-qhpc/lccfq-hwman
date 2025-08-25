@@ -816,7 +816,7 @@ wheels = [
 [[package]]
 name = "labcore"
 version = "0.0.0"
-source = { git = "https://github.com/toolsforexperiments/labcore#a003240a9a87a9f58708acfa3f3a7eb380d17e84" }
+source = { editable = "../labcore" }
 
 [[package]]
 name = "lccfq-hwman"
@@ -829,11 +829,13 @@ dependencies = [
     { name = "h5py" },
     { name = "instrumentserver" },
     { name = "labcore" },
+    { name = "lmfit" },
     { name = "pandas" },
     { name = "pyqt5" },
     { name = "pyro4" },
     { name = "python-dotenv" },
     { name = "qcodes" },
+    { name = "qcui-analysis" },
     { name = "qcui-measurement" },
     { name = "qick" },
     { name = "qtpy" },
@@ -860,12 +862,14 @@ requires-dist = [
     { name = "grpcio-tools", specifier = ">=1.71.0" },
     { name = "h5py", specifier = ">=3.13.0" },
     { name = "instrumentserver", editable = "../instrumentserver" },
-    { name = "labcore", git = "https://github.com/toolsforexperiments/labcore" },
+    { name = "labcore", editable = "../labcore" },
+    { name = "lmfit", specifier = ">=1.3.4" },
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "pyqt5", specifier = ">=5.15.11" },
     { name = "pyro4", specifier = ">=4.82" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "qcodes", specifier = ">=0.53.0" },
+    { name = "qcui-analysis", editable = "../analysis" },
     { name = "qcui-measurement", editable = "../measurement" },
     { name = "qick", editable = "../qick" },
     { name = "qtpy", specifier = ">=2.4.3" },
@@ -1769,6 +1773,16 @@ wheels = [
 ]
 
 [[package]]
+name = "qcui-analysis"
+source = { editable = "../analysis" }
+dependencies = [
+    { name = "qutip" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "qutip", specifier = ">=4.7" }]
+
+[[package]]
 name = "qcui-measurement"
 version = "0.1.0"
 source = { editable = "../measurement" }
@@ -1808,6 +1822,27 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/70/01/392eba83c8e47b946b929d7c46e0f04b35e9671f8bb6fc36b6f7945b4de8/qtpy-2.4.3.tar.gz", hash = "sha256:db744f7832e6d3da90568ba6ccbca3ee2b3b4a890c3d6fbbc63142f6e4cdf5bb", size = 66982, upload-time = "2025-02-11T15:09:25.759Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/69/76/37c0ccd5ab968a6a438f9c623aeecc84c202ab2fabc6a8fd927580c15b5a/QtPy-2.4.3-py3-none-any.whl", hash = "sha256:72095afe13673e017946cc258b8d5da43314197b741ed2890e563cf384b51aa1", size = 95045, upload-time = "2025-02-11T15:09:24.162Z" },
+]
+
+[[package]]
+name = "qutip"
+version = "5.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "packaging" },
+    { name = "scipy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/11/63/b4c00de6068b229cecb92016cf9d2bd849d919f5a0b4247f5ea933e82349/qutip-5.2.0.tar.gz", hash = "sha256:9725186ebc22c8cbd543faaf4c4c1e628bf77f185553a89339104b6430015b7a", size = 6969363, upload-time = "2025-06-06T21:38:37.867Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/79/e0/20c1a68081b09bfa63fed3aedbcfdb113ff9c5c90169cb69a920d54ce327/qutip-5.2.0-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:680581fccc8305d03a4b9360eb1ea36dcc02ce5e5610de44e4f9ce7ae1a50644", size = 10635285, upload-time = "2025-06-06T21:38:18.403Z" },
+    { url = "https://files.pythonhosted.org/packages/ec/4a/b043694511fc71db6916e19c01f940093f32064abecd9b4f5316728bc8c8/qutip-5.2.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:763134895c36eff8e5849e5e17e73c7014cf15d85d972447c47bd103e9727af3", size = 10324390, upload-time = "2025-06-06T21:38:20.634Z" },
+    { url = "https://files.pythonhosted.org/packages/01/cd/ad3e57417a3ba1f635018a83620d24c3dfe53a7da350ef0f23558d022382/qutip-5.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cdadc261889ed7a7db1af0a6db42ade040d77dfb39205a0bcc0f80112d10e3a2", size = 30851072, upload-time = "2025-06-06T21:38:23.278Z" },
+    { url = "https://files.pythonhosted.org/packages/14/73/c91608584d3c85c4d698aa04f54c39a69f22bc3d84fc035f610de7532754/qutip-5.2.0-cp312-cp312-win_amd64.whl", hash = "sha256:70a8f9b38b22d72e5187b1a1e8ca8e871660948dd3324ef22a4f09aa20b71ac0", size = 10138163, upload-time = "2025-06-06T21:38:27.746Z" },
+    { url = "https://files.pythonhosted.org/packages/68/aa/0e2905c349c955c0e056bfc20d2ba4a64dc9dc607b850702c11fc512a75a/qutip-5.2.0-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:b74468e05c296852777e04e23b57cb90264ea3c8db00a384589d9d2aeac15013", size = 10598022, upload-time = "2025-06-06T21:38:29.59Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/ec/2968f2afa8e26c02a669c0aa61036b1cf93d8301a86c5a3b1f184cd47311/qutip-5.2.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:b63726d4cd7c8399a6e1a9fbdbfca1968e2bbb5aeb7b2ff6f5b598fd63ae1005", size = 10290850, upload-time = "2025-06-06T21:38:31.72Z" },
+    { url = "https://files.pythonhosted.org/packages/68/de/6c05263deda1c8c4d4296ff8cb1fd512d71b9febac4b66fc5653f022c94d/qutip-5.2.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:37773c665a65f5f316144eb59f71521ad3f43f7b24ca34454116d1806bfd7422", size = 30554435, upload-time = "2025-06-06T21:38:33.839Z" },
+    { url = "https://files.pythonhosted.org/packages/00/0c/8003776a4bfbda86713fad0b86ac51de1c15fc0d652b43d8244b612ae178/qutip-5.2.0-cp313-cp313-win_amd64.whl", hash = "sha256:47ad10b10ede76ca84362f9b33a04e56e8b913cc018f0daae35d556b219ad41c", size = 10133063, upload-time = "2025-06-06T21:38:36.036Z" },
 ]
 
 [[package]]

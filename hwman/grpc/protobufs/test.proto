@@ -37,6 +37,7 @@ message TestResponse {
 
 service Test {
     rpc StandardTest(TestRequest) returns (TestResponse);
+    rpc ResSpecCal(TestRequest) returns (TestResponse);
 }
 
 

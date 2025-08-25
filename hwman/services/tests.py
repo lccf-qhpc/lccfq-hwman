@@ -20,11 +20,14 @@ from qcui_measurement.qick.single_transmon_v2 import (
     T2RProgram,
     T2nProgram,
 )
+
+from hwman.hw_tests.tests import res_spect
 from labcore.measurement.storage import run_and_save_sweep
 
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestServicer  # type: ignore
 from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType  # type: ignore
 
+from hwman.hw_tests.measurements.calibration import Calibration
 from hwman.services import Service
 
 
@@ -45,7 +48,7 @@ class TestService(Service, TestServicer):
         # Import is here and not at top because my_experiment_setup checks that the instrumentserver is running.
         # This happens before StandardService is initialized but after the server imports this module.
         try:
-            from hwman.services.my_experiment_setup import conf
+            from hwman.hw_tests.measurements.my_experiment_setup import conf
         except ImportError as e:
             logger.error("Could not import my_experiment_setup.py")
             raise e
@@ -59,7 +62,7 @@ class TestService(Service, TestServicer):
                 logger.info("Connected to qick")
             except Pyro4.errors.NamingError:
                 logger.warning(
-                    f"Could not connec to qick, Probably still starting up, retrying in 1 second. Tiems attempted: {retries}"
+                    f"Could not connec to qick, Probably still starting up, retrying in 1 second. Times attempted: {retries}"
                 )
                 time.sleep(1)
                 retries += 1
@@ -67,6 +70,9 @@ class TestService(Service, TestServicer):
                 break
 
         self.conf = conf
+
+        self.calibration = Calibration()
+
         logger.info(f"TestService initialized with data_dir: {self.data_dir}")
 
     def _perform_measurement(self, measurement_type: TestType, pid: str) -> None:
@@ -118,3 +124,12 @@ class TestService(Service, TestServicer):
         return TestResponse()
 
     def cleanup(self) -> None: ...
+
+    def ResSpecCal(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+        logger.info("ResSpecCal called")
+        res_spect()
+        logger.info("ResSpecCal finished")
+
+        return TestResponse(status=True)
+
+

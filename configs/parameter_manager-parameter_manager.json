@@ -5,7 +5,7 @@
   },
   "parameter_manager.msmt.reps": {
     "unit": "",
-    "value": 10
+    "value": 600
   },
   "parameter_manager.msmt.soft_avgs": {
     "unit": "",
@@ -13,7 +13,7 @@
   },
   "parameter_manager.msmt.steps": {
     "unit": "",
-    "value": 101
+    "value": 1000
   },
   "parameter_manager.msmt.steps2": {
     "unit": "",
@@ -21,7 +21,7 @@
   },
   "parameter_manager.msmt.trig_time": {
     "unit": "us",
-    "value": 0.48
+    "value": 0.47
   },
   "parameter_manager.qubit.T1": {
     "unit": "us",
@@ -49,7 +49,7 @@
   },
   "parameter_manager.qubit.end_ge_f": {
     "unit": "MHz",
-    "value": 5415
+    "value": 3555.22
   },
   "parameter_manager.qubit.end_ge_g": {
     "unit": "",
@@ -57,11 +57,11 @@
   },
   "parameter_manager.qubit.f_ge": {
     "unit": "MHz",
-    "value": 5410.3759
+    "value": 3451.931703731156
   },
   "parameter_manager.qubit.gain": {
     "unit": "",
-    "value": 0.7616909350083776
+    "value": 0.1
   },
   "parameter_manager.qubit.mixer_f": {
     "unit": "MHz",
@@ -81,11 +81,11 @@
   },
   "parameter_manager.qubit.sigma": {
     "unit": "us",
-    "value": 0.1
+    "value": 0.2
   },
   "parameter_manager.qubit.start_ge_f": {
     "unit": "MHz",
-    "value": 5405
+    "value": 3355.22
   },
   "parameter_manager.qubit.start_ge_g": {
     "unit": "",
@@ -101,19 +101,19 @@
   },
   "parameter_manager.readout.end_f": {
     "unit": "MHz",
-    "value": 7465
+    "value": 7138.2802297970065
   },
   "parameter_manager.readout.end_g": {
     "unit": "",
-    "value": 0.05
+    "value": 0.7
   },
   "parameter_manager.readout.f_res": {
     "unit": "MHz",
-    "value": 7462.9
+    "value": 7133.2802297970065
   },
   "parameter_manager.readout.gain": {
     "unit": "",
-    "value": 0.01
+    "value": 0.44994811695049747
   },
   "parameter_manager.readout.length": {
     "unit": "us",
@@ -129,10 +129,10 @@
   },
   "parameter_manager.readout.start_f": {
     "unit": "MHz",
-    "value": 7461
+    "value": 7128.2802297970065
   },
   "parameter_manager.readout.start_g": {
     "unit": "",
-    "value": 0.001
+    "value": 0.2
   }
 }

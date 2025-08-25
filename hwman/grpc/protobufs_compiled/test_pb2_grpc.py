@@ -39,8 +39,8 @@ class TestStub(object):
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
-        self.start = channel.unary_unary(
-                '/Test/start',
+        self.ResSpecCal = channel.unary_unary(
+                '/Test/ResSpecCal',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
@@ -55,7 +55,7 @@ class TestServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def start(self, request, context):
+    def ResSpecCal(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -69,8 +69,8 @@ def add_TestServicer_to_server(servicer, server):
                     request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.SerializeToString,
             ),
-            'start': grpc.unary_unary_rpc_method_handler(
-                    servicer.start,
+            'ResSpecCal': grpc.unary_unary_rpc_method_handler(
+                    servicer.ResSpecCal,
                     request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.SerializeToString,
             ),
@@ -113,7 +113,7 @@ class Test(object):
             _registered_method=True)
 
     @staticmethod
-    def start(request,
+    def ResSpecCal(request,
             target,
             options=(),
             channel_credentials=None,
@@ -126,7 +126,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/start',
+            '/Test/ResSpecCal',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,

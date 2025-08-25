@@ -8,6 +8,7 @@ from typing import Any
 
 from instrumentserver.client import Client
 
+from labcore import setup_measurements
 from labcore.setup_measurements import find_or_create_remote_instrument
 
 import labcore.instruments.qick.qick_sweep_v2 as qick_sweep_v2
@@ -78,7 +79,11 @@ class QickConfig(QBoardConfig):
 
 conf = QickConfig(
     params=params,
-    nameserver_host=os.environ["NAMESERVER_HOST"],
+    nameserver_host="192.168.1.10",
     nameserver_name="rfsoc",
 )
 qick_sweep_v2.config = conf  # type: ignore[assignment]
+# these need to be specified so all measurement code is configured correctly
+setup_measurements.options.instrument_clients = {'instruments': instruments}
+setup_measurements.options.parameters = params
+
