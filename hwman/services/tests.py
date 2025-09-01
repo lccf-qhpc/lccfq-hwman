@@ -48,7 +48,7 @@ class TestService(Service, TestServicer):
         # Import is here and not at top because my_experiment_setup checks that the instrumentserver is running.
         # This happens before StandardService is initialized but after the server imports this module.
         try:
-            from hwman.hw_tests.measurements.my_experiment_setup import conf
+            from hwman.hw_tests.utils import conf
         except ImportError as e:
             logger.error("Could not import my_experiment_setup.py")
             raise e
@@ -62,7 +62,7 @@ class TestService(Service, TestServicer):
                 logger.info("Connected to qick")
             except Pyro4.errors.NamingError:
                 logger.warning(
-                    f"Could not connec to qick, Probably still starting up, retrying in 1 second. Times attempted: {retries}"
+                    f"Could not connect to qick, Probably still starting up, retrying in 1 second. Times attempted: {retries}"
                 )
                 time.sleep(1)
                 retries += 1
@@ -70,8 +70,6 @@ class TestService(Service, TestServicer):
                 break
 
         self.conf = conf
-
-        self.calibration = Calibration()
 
         logger.info(f"TestService initialized with data_dir: {self.data_dir}")
 
@@ -127,9 +125,23 @@ class TestService(Service, TestServicer):
 
     def ResSpecCal(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
         logger.info("ResSpecCal called")
-        res_spect()
+        # res_spect()
+        # Import needs to happen here to let the hwman start and have the instrumentserver running before anything the my_experiment setup happens.
+        from hwman.hw_tests.res_spec import res_spec
+        res_spec()
+
+
         logger.info("ResSpecCal finished")
 
         return TestResponse(status=True)
+
+    def CalculateTeff(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+        logger.info("CalculateTeff called")
+        from hwman.hw_tests.res_spec import calculate_and_set_teff
+        calculate_and_set_teff()
+        logger.info("CalculateTeff finished")
+        return TestResponse(status=True)
+
+
 
 

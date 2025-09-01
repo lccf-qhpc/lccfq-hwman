@@ -31,26 +31,6 @@ from qcui_measurement.qick.single_transmon_v2 import (
 logger = logging.getLogger(__name__)
 
 
-def set_bandpass_filters(conf):
-    conf.config()
-    # Setting badnpass filters for DAC
-    conf.soc.rfb_set_gen_filter(conf.config()[1]['q_gen_ch'], fc=conf.config()[1]["q_ge"] / 1000, ftype='bandpass',
-                                bw=1.0)  # Frequency units ere are in GHz
-    conf.soc.rfb_set_gen_filter(conf.config()[1]['ro_gen_ch'], fc=conf.config()[1]["ro_freq"] / 1000, ftype='bandpass',
-                                bw=1.0)  # Frequency units ere are in GHz
-    conf.soc.rfb_set_ro_filter(conf.config()[1]['ro_ch'], fc=conf.config()[1]["ro_freq"] / 1000, ftype='bandpass',
-                               bw=1.0)  # Frequency units ere are in GHz
-
-    # Set attenuator on DAC.
-    conf.soc.rfb_set_gen_rf(conf.config()[1]['q_gen_ch'], 5, 5)  # Frequency units ere are in GHz
-    conf.soc.rfb_set_gen_rf(conf.config()[1]['ro_gen_ch'], 5, 15)  # Frequency units ere are in GHz
-    # Set attenuator on ADC.
-    conf.soc.rfb_set_ro_rf(conf.config()[1]['ro_ch'], 0)  # Frequency units ere are in GHz
-
-
-def generate_id():
-    return str(uuid.uuid4())[:8]
-
 
 class Calibration:
 

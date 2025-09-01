@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1fhwman/grpc/protobufs/test.proto\"<\n\x08\x44\x61taAxis\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06values\x18\x02 \x03(\x02\x12\x12\n\ndepends_on\x18\x03 \x03(\t\"a\n\x0bTestRequest\x12\x0b\n\x03pid\x18\x01 \x01(\t\x12\x1c\n\ttest_type\x18\x02 \x01(\x0e\x32\t.TestType\x12\r\n\x05shots\x18\x03 \x01(\x05\x12\x18\n\x10return_full_data\x18\x04 \x01(\x08\">\n\x0cTestResponse\x12\x0b\n\x03pid\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\x08\x12\x11\n\tdata_path\x18\x03 \x01(\t*\xc3\x01\n\x08TestType\x12\x1b\n\x17\x41\x44\x43_TRIGGER_CALIBRATION\x10\x00\x12\x12\n\x0eRESONATOR_SPEC\x10\x01\x12\x1c\n\x18PULSE_PROBE_SPECTROSCOPY\x10\x02\x12\x0e\n\nPOWER_RABI\x10\x03\x12\x0b\n\x07PI_SPEC\x10\x04\x12\x1b\n\x17RESONATOR_SPEC_AFTER_PI\x10\x05\x12\x06\n\x02T1\x10\x06\x12\x07\n\x03T2R\x10\x07\x12\x07\n\x03T2E\x10\x08\x12\x14\n\x10STATE_ASSIGNMENT\x10\t2^\n\x04Test\x12+\n\x0cStandardTest\x12\x0c.TestRequest\x1a\r.TestResponse\x12)\n\nResSpecCal\x12\x0c.TestRequest\x1a\r.TestResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1fhwman/grpc/protobufs/test.proto\"<\n\x08\x44\x61taAxis\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0e\n\x06values\x18\x02 \x03(\x02\x12\x12\n\ndepends_on\x18\x03 \x03(\t\"a\n\x0bTestRequest\x12\x0b\n\x03pid\x18\x01 \x01(\t\x12\x1c\n\ttest_type\x18\x02 \x01(\x0e\x32\t.TestType\x12\r\n\x05shots\x18\x03 \x01(\x05\x12\x18\n\x10return_full_data\x18\x04 \x01(\x08\">\n\x0cTestResponse\x12\x0b\n\x03pid\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\x08\x12\x11\n\tdata_path\x18\x03 \x01(\t*\xc3\x01\n\x08TestType\x12\x1b\n\x17\x41\x44\x43_TRIGGER_CALIBRATION\x10\x00\x12\x12\n\x0eRESONATOR_SPEC\x10\x01\x12\x1c\n\x18PULSE_PROBE_SPECTROSCOPY\x10\x02\x12\x0e\n\nPOWER_RABI\x10\x03\x12\x0b\n\x07PI_SPEC\x10\x04\x12\x1b\n\x17RESONATOR_SPEC_AFTER_PI\x10\x05\x12\x06\n\x02T1\x10\x06\x12\x07\n\x03T2R\x10\x07\x12\x07\n\x03T2E\x10\x08\x12\x14\n\x10STATE_ASSIGNMENT\x10\t2\x8c\x01\n\x04Test\x12+\n\x0cStandardTest\x12\x0c.TestRequest\x1a\r.TestResponse\x12)\n\nResSpecCal\x12\x0c.TestRequest\x1a\r.TestResponse\x12,\n\rCalculateTeff\x12\x0c.TestRequest\x1a\r.TestResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,6 +39,6 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_TESTREQUEST']._serialized_end=194
   _globals['_TESTRESPONSE']._serialized_start=196
   _globals['_TESTRESPONSE']._serialized_end=258
-  _globals['_TEST']._serialized_start=458
-  _globals['_TEST']._serialized_end=552
+  _globals['_TEST']._serialized_start=459
+  _globals['_TEST']._serialized_end=599
 # @@protoc_insertion_point(module_scope)
