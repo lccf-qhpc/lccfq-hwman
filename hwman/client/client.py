@@ -18,7 +18,7 @@ class Client:
         self,
         name: str = "default",
         address: str = "localhost",
-        port: int = 50001,
+        port: int = 50222,
         clients_cert_dir: str | Path = "./certs/clients",
         ca_cert_path: str | Path = "./certs/ca.crt",
         initialize_at_start: bool = True,
@@ -222,6 +222,17 @@ class Client:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             self.test_stub.ResSpecCal(
+                TestRequest()
+            )
+            return None
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start test: {e}")
+            return None
+
+    def start_teff_calculation(self) -> str | None:
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            self.test_stub.CalculateTeff(
                 TestRequest()
             )
             return None
