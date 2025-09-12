@@ -10,6 +10,8 @@ import Pyro4
 
 import grpc
 
+from labcore.measurement.storage import run_and_save_sweep
+
 from qcui_measurement.qick.single_transmon_v2 import (
     FreqSweepProgram,
     PulseProbeSpectroscopy,
@@ -21,16 +23,16 @@ from qcui_measurement.qick.single_transmon_v2 import (
     T2nProgram,
 )
 
-from labcore.measurement.storage import run_and_save_sweep
+# This needs to be imported before any other subprocesses start.
+from qcui_analysis.fitfuncs.resonators import HangerResponseBruno  # noqa: F401  # Required for side effects
 
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestServicer  # type: ignore
 from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType  # type: ignore
 
-# This needs to be imported before any other subprocesses start.
-from qcui_analysis.fitfuncs.resonators import HangerResponseBruno  # noqa: F401  # Required for side effects
 
 from hwman.services import Service
-
+from hwman.hw_tests.res_spec import res_spec
+from hwman.hw_tests.utils import setup_measurement_env
 
 logger = logging.getLogger(__name__)
 
@@ -46,11 +48,9 @@ class TestService(Service, TestServicer):
         self.data_dir = data_dir
 
     def _start(self) -> None:
-        # Import is here and not at top because my_experiment_setup checks that the instrumentserver is running.
-        # This happens before StandardService is initialized but after the server imports this module.
         try:
-            from hwman.hw_tests.utils import conf
-        except ImportError as e:
+            conf = setup_measurement_env()
+        except Exception as e:
             logger.error("Could not import my_experiment_setup.py")
             raise e
 
@@ -65,7 +65,7 @@ class TestService(Service, TestServicer):
                 logger.warning(
                     f"Could not connect to qick, Probably still starting up, retrying in 1 second. Times attempted: {retries}"
                 )
-                time.sleep(1)
+                time.sleep(5)
                 retries += 1
             else:
                 break
@@ -126,10 +126,7 @@ class TestService(Service, TestServicer):
 
     def ResSpecCal(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
         logger.info("ResSpecCal called")
-        # res_spect()
-        # Import needs to happen here to let the hwman start and have the instrumentserver running before anything the my_experiment setup happens.
-        from hwman.hw_tests.res_spec import res_spec
-        res_spec()
+        res_spec(self.conf)
         logger.info("ResSpecCal finished")
 
         return TestResponse(status=True)
