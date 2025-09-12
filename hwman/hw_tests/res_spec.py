@@ -24,13 +24,12 @@ from hwman.utils.plotting import (
 from qcui_measurement.qick.single_transmon_v2 import FreqSweepProgram
 from qcui_analysis.fitfuncs.resonators import HangerResponseBruno
 
-from hwman.hw_tests.utils import conf, set_bandpass_filters, generate_id
-
+from hwman.hw_tests.utils import set_bandpass_filters, generate_id, QickConfig, setup_measurement_env
 
 logger = logging.getLogger(__name__)
 
 
-def measure_res_spec(job_id: str | None):
+def measure_res_spec(conf: QickConfig, job_id: str | None):
 
     if job_id is None:
         job_id = generate_id()
@@ -123,11 +122,11 @@ def analyze_res_spec(loc: Path):
 
     logger.info("Finished analyzing Resonator Spec")
 
-def res_spec(job_id: str | None = None):
+def res_spec(conf, job_id: str | None = None):
     if job_id is None:
         job_id = generate_id()
 
-    loc, da = measure_res_spec(job_id)
+    loc, da = measure_res_spec(conf, job_id)
     analyze_res_spec(loc)
 
 
