@@ -23,10 +23,6 @@
     "unit": "us",
     "value": 0.47
   },
-  "parameter_manager.msmt.t_eff": {
-    "unit": "us",
-    "value": 7.246431204448628
-  },
   "parameter_manager.qubit.T1": {
     "unit": "us",
     "value": 1

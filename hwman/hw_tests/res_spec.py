@@ -1,109 +1,33 @@
+import os
 import logging
-import uuid
 from pathlib import Path
 
 import numpy as np
 
 from labcore.data.datadict import DataDict
 from labcore.data.datadict_storage import datadict_from_hdf5
+from labcore.measurement.storage import run_and_save_sweep
 
-from qcui_measurement.qick.single_transmon_v2 import FreqSweepProgram
-from qcui_analysis.fitfuncs.resonators import HangerResponseBruno
+os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'  # Disable HDF5 file locking
+os.environ['OPENBLAS_NUM_THREADS'] = '1'  # Limit OpenBLAS threads
+os.environ['MKL_NUM_THREADS'] = '1'  # Limit MKL threads
+os.environ['OMP_NUM_THREADS'] = '1'  # Limit OpenMP threads
+os.environ['NUMEXPR_NUM_THREADS'] = '1'  # Limit NumExpr threads
 
 
-from hwman.hw_tests.utils import conf, run_measurement, set_bandpass_filters, generate_id, params
 from hwman.utils.plotting import (
-    create_plot_in_process,
     create_plot_in_subprocess,
     PlotSpec,
     PlotItem,
 )
 
+from qcui_measurement.qick.single_transmon_v2 import FreqSweepProgram
+from qcui_analysis.fitfuncs.resonators import HangerResponseBruno
+
+from hwman.hw_tests.utils import conf, set_bandpass_filters, generate_id
+
 
 logger = logging.getLogger(__name__)
-
-
-def calculate_and_set_teff():
-
-    logger.info("Shifting frequency to off resonance")
-    params.readout.start_f(params.readout.start_f() + 10)
-    params.readout.end_f(params.readout.end_f() + 10)
-    logger.info("SHIFT SUCCESFULL")
-
-    try:
-        teff_id = "AUTOMATIC_CALIBRATION_" + generate_id()
-        logger.info(f"Calculating TEFF {teff_id}")
-        loc, data = measure_res_spec(teff_id)
-
-        if data is None:
-            logger.warning("No data found, loading from file")
-            data = datadict_from_hdf5(loc)
-        logger.debug("Data acquired, calculating TEFF")
-        signal = data["signal"]["values"]
-        freq = data["freq"]["values"]
-
-        phase_unwrap = np.unwrap(np.angle(signal))
-        phase_slope = np.polyfit(freq, phase_unwrap, 1)[0]
-
-        t_eff = phase_slope
-
-        # phase = np.arctan2(signal.imag, signal.real)
-        # phase_unwrap = np.unwrap(phase)/(2 * np.pi)
-        # vals_matrix = np.vstack([freq, np.ones_like(freq)]).T
-        # t_eff = np.linalg.lstsq(vals_matrix, phase_unwrap, rcond=None)[0][0]
-
-        logger.debug("T_EFF calculated. Previous T_EFF %s us, new T_EFF, %s", params.msmt.t_eff(), t_eff)
-
-        params.msmt.t_eff(t_eff)
-
-        plot_path = loc/"image.png"
-        # Create plot using the new generic utility
-        plot_spec = PlotSpec(
-            plot_path=str(plot_path),
-            title="Phase_unwrap",
-            xlabel="Frequency (MHz)",
-            ylabel="Signal (A.U.)",
-            legend=True,
-            plots=[
-                PlotItem(x=freq, y=phase_unwrap, kwargs={'label': 'Data'}),
-            ]
-        )
-        create_plot_in_subprocess(plot_spec)
-
-        plot_path = loc/"trace.png"
-        plot_spec = PlotSpec(
-            plot_path=str(plot_path),
-            title="trace",
-            xlabel="Frequency (MHz)",
-            ylabel="Signal (A.U.)",
-            legend=True,
-            plots=[
-                PlotItem(x=freq, y=np.abs(signal), kwargs={'label': 'Data'}),
-            ]
-        )
-        create_plot_in_subprocess(plot_spec)
-
-        # plot_path = loc / "phase.png"
-        # plot_spec = PlotSpec(
-        #     plot_path=str(plot_path),
-        #     title="phase",
-        #     xlabel="Frequency (MHz)",
-        #     ylabel="Signal (A.U.)",
-        #     legend=True,
-        #     plots=[
-        #         PlotItem(x=freq, y=phase, kwargs={'label': 'Data'}),
-        #     ]
-        # )
-        # create_plot_in_subprocess(plot_spec)
-
-
-    finally:
-        logger.info("Shifting frequency to on resonance")
-        params.readout.start_f(params.readout.start_f() - 10)
-        params.readout.end_f(params.readout.end_f() - 10)
-
-
-    return t_eff
 
 
 def measure_res_spec(job_id: str | None):
@@ -120,7 +44,7 @@ def measure_res_spec(job_id: str | None):
 
     sweep = FreqSweepProgram()
     logger.debug("Sweep created, running measurement")
-    loc, da = run_measurement(sweep, f"resonator_spec~{job_id}", return_data=True)
+    loc, da = run_and_save_sweep(sweep, "data", f"resonator_spec~{job_id}", return_data=True)
     logger.info("Measurement done, data in %s", loc)
 
     return loc, da
@@ -130,7 +54,6 @@ def add_mag_and_unwind(data: DataDict):
     logger.debug("Adding mag and unwind")
     freq = data["freq"]["values"]
     signal_raw = data["signal"]["values"]
-    logger.warning("TEFF IS %s", params.msmt.t_eff()/(2*np.pi))
     phase_unwrap = np.unwrap(np.angle(signal_raw))
     phase_slope = np.polyfit(freq, phase_unwrap, 1)[0]
 

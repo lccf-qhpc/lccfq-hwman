@@ -3,9 +3,7 @@ from typing import Any
 
 import labcore.instruments.qick.qick_sweep_v2 as qick_sweep_v2
 from instrumentserver.client import Client
-from labcore import setup_measurements
 from labcore.instruments.qick.config import QBoardConfig
-from labcore.setup_measurements import find_or_create_remote_instrument, run_measurement
 from qick.asm_v2 import QickSweep1D
 
 
@@ -49,7 +47,7 @@ def set_bandpass_filters(conf_: QBoardConfig):
 
 
 instruments = Client()
-params = find_or_create_remote_instrument(instruments, "parameter_manager")
+params = instruments.get_instrument("parameter_manager")
 
 
 class QickConfig(QBoardConfig):
@@ -114,6 +112,3 @@ conf = QickConfig(
     nameserver_name="rfsoc",
 )
 qick_sweep_v2.config = conf  # type: ignore[assignment]
-# these need to be specified so all measurement code is configured correctly
-setup_measurements.options.instrument_clients = {"instruments": instruments}
-setup_measurements.options.parameters = params

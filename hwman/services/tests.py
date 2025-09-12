@@ -21,13 +21,14 @@ from qcui_measurement.qick.single_transmon_v2 import (
     T2nProgram,
 )
 
-from hwman.hw_tests.tests import res_spect
 from labcore.measurement.storage import run_and_save_sweep
 
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestServicer  # type: ignore
 from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType  # type: ignore
 
-from hwman.hw_tests.measurements.calibration import Calibration
+# This needs to be imported before any other subprocesses start.
+from qcui_analysis.fitfuncs.resonators import HangerResponseBruno  # noqa: F401  # Required for side effects
+
 from hwman.services import Service
 
 
@@ -129,19 +130,8 @@ class TestService(Service, TestServicer):
         # Import needs to happen here to let the hwman start and have the instrumentserver running before anything the my_experiment setup happens.
         from hwman.hw_tests.res_spec import res_spec
         res_spec()
-
-
         logger.info("ResSpecCal finished")
 
         return TestResponse(status=True)
-
-    def CalculateTeff(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
-        logger.info("CalculateTeff called")
-        from hwman.hw_tests.res_spec import calculate_and_set_teff
-        calculate_and_set_teff()
-        logger.info("CalculateTeff finished")
-        return TestResponse(status=True)
-
-
 
 
