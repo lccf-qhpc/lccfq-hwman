@@ -14,10 +14,10 @@ enum TestType {
     STATE_ASSIGNMENT = 9;
 }
 
-message DataAxis {
+message FitParameter {
     string name = 1;
-    repeated float values = 2;
-    repeated string depends_on = 3;
+    double value = 2;
+    double error = 3;
 }
 
 message TestRequest {
@@ -31,14 +31,15 @@ message TestResponse {
     string pid = 1;
     bool status = 2;
     string data_path = 3;
-    // repeated DataAxis data = 4;
+    double snr = 4;
+    map<string, FitParameter> fit_parameters = 5;
 }
 
 
 service Test {
     rpc StandardTest(TestRequest) returns (TestResponse);
     rpc ResSpecCal(TestRequest) returns (TestResponse);
-    rpc CalculateTeff(TestRequest) returns (TestResponse);
+    rpc ResSpecVsGainCal(TestRequest) returns (TestResponse);
 }
 
 
