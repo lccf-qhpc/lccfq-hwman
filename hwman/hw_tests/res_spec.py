@@ -1,4 +1,3 @@
-import os
 import logging
 from pathlib import Path
 
@@ -8,12 +7,6 @@ from labcore.analysis import FitResult
 from labcore.data.datadict import DataDict
 from labcore.data.datadict_storage import datadict_from_hdf5
 from labcore.measurement.storage import run_and_save_sweep
-
-os.environ['HDF5_USE_FILE_LOCKING'] = 'FALSE'  # Disable HDF5 file locking
-os.environ['OPENBLAS_NUM_THREADS'] = '1'  # Limit OpenBLAS threads
-os.environ['MKL_NUM_THREADS'] = '1'  # Limit MKL threads
-os.environ['OMP_NUM_THREADS'] = '1'  # Limit OpenMP threads
-os.environ['NUMEXPR_NUM_THREADS'] = '1'  # Limit NumExpr threads
 
 
 from hwman.utils.plotting import (
