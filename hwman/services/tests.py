@@ -10,6 +10,7 @@ import Pyro4
 
 import grpc
 
+from hwman.hw_tests.res_spec_vs_gain import res_spec_vs_gain
 from labcore.measurement.storage import run_and_save_sweep
 
 from qcui_measurement.qick.single_transmon_v2 import (
@@ -32,7 +33,7 @@ from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, Te
 
 from hwman.services import Service
 from hwman.hw_tests.res_spec import res_spec
-from hwman.hw_tests.utils import setup_measurement_env, generate_id
+from hwman.hw_tests.utils import setup_measurement_env, generate_id, set_bandpass_filters
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +72,9 @@ class TestService(Service, TestServicer):
                 break
 
         self.conf = conf
+
+        # Once connection to qick is OK, set the bandpass filters
+        set_bandpass_filters(conf)
 
         logger.info(f"TestService initialized with data_dir: {self.data_dir}")
 
@@ -136,15 +140,14 @@ class TestService(Service, TestServicer):
             )
         return fit_params
 
-
     def ResSpecCal(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
         job_id = request.pid
-        if job_id is None or "":
+        if job_id is None or job_id == "":
             job_id = generate_id()
         logger.info("ResSpecCal called")
 
         try:
-            loc, fit_result, snr = res_spec(self.conf, job_id)
+            loc, fit_result, snr = res_spec(job_id)
             logger.info("ResSpecCal finished")
             fit_params = self._assemble_fit_params(fit_result)
 
@@ -153,4 +156,13 @@ class TestService(Service, TestServicer):
             logger.error(e)
             return TestResponse(status=False, data_path=str(self.data_dir), pid=job_id)
 
+    def ResSpecVsGainCal(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+        job_id = request.pid
+        if job_id is None or job_id == "":
+            job_id = generate_id()
+        logger.info("ResSPecVs called")
+
+        ret = res_spec_vs_gain(job_id)
+        logger.info("ResSPecVs finished")
+        return TestResponse(status=True)
 

@@ -25,22 +25,17 @@ from hwman.utils.plotting import (
 from qcui_measurement.qick.single_transmon_v2 import FreqSweepProgram
 from qcui_analysis.fitfuncs.resonators import HangerResponseBruno
 
-from hwman.hw_tests.utils import set_bandpass_filters, generate_id, QickConfig, setup_measurement_env
+from hwman.hw_tests.utils import generate_id
 
 logger = logging.getLogger(__name__)
 
 
-def measure_res_spec(conf: QickConfig, job_id: str | None):
+def measure_res_spec(job_id: str | None):
 
     if job_id is None:
         job_id = generate_id()
 
     logger.info("Starting resonator spectroscopy for {}".format(job_id))
-    logger.debug("Checking configuration")
-    conf.config()
-    logger.debug("Configuration OK, setting bandpass filters")
-    set_bandpass_filters(conf)
-    logger.debug("bandpass filters set")
 
     sweep = FreqSweepProgram()
     logger.debug("Sweep created, running measurement")
@@ -125,8 +120,8 @@ def analyze_res_spec(loc: Path):
 
     return fit_result, residuals, snr
 
-def res_spec(conf: QickConfig, job_id: str) -> tuple[Path, FitResult, float]:
-    loc, da = measure_res_spec(conf, job_id)
+def res_spec(job_id: str) -> tuple[Path, FitResult, float]:
+    loc, da = measure_res_spec(job_id)
     fit_result, residuals, snr = analyze_res_spec(loc)
     return loc, fit_result, snr
 
