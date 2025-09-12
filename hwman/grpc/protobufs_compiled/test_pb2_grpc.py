@@ -44,8 +44,8 @@ class TestStub(object):
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
-        self.CalculateTeff = channel.unary_unary(
-                '/Test/CalculateTeff',
+        self.ResSpecVsGainCal = channel.unary_unary(
+                '/Test/ResSpecVsGainCal',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
@@ -66,7 +66,7 @@ class TestServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def CalculateTeff(self, request, context):
+    def ResSpecVsGainCal(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -85,8 +85,8 @@ def add_TestServicer_to_server(servicer, server):
                     request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.SerializeToString,
             ),
-            'CalculateTeff': grpc.unary_unary_rpc_method_handler(
-                    servicer.CalculateTeff,
+            'ResSpecVsGainCal': grpc.unary_unary_rpc_method_handler(
+                    servicer.ResSpecVsGainCal,
                     request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.SerializeToString,
             ),
@@ -156,7 +156,7 @@ class Test(object):
             _registered_method=True)
 
     @staticmethod
-    def CalculateTeff(request,
+    def ResSpecVsGainCal(request,
             target,
             options=(),
             channel_credentials=None,
@@ -169,7 +169,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/CalculateTeff',
+            '/Test/ResSpecVsGainCal',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,

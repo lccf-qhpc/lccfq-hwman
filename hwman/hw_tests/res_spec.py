@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
+from labcore.analysis import FitResult
 from labcore.data.datadict import DataDict
 from labcore.data.datadict_storage import datadict_from_hdf5
 from labcore.measurement.storage import run_and_save_sweep
@@ -122,12 +123,12 @@ def analyze_res_spec(loc: Path):
 
     logger.info("Finished analyzing Resonator Spec")
 
-def res_spec(conf, job_id: str | None = None):
-    if job_id is None:
-        job_id = generate_id()
+    return fit_result, residuals, snr
 
+def res_spec(conf: QickConfig, job_id: str) -> tuple[Path, FitResult, float]:
     loc, da = measure_res_spec(conf, job_id)
-    analyze_res_spec(loc)
+    fit_result, residuals, snr = analyze_res_spec(loc)
+    return loc, fit_result, snr
 
 
 

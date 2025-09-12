@@ -27,12 +27,12 @@ from qcui_measurement.qick.single_transmon_v2 import (
 from qcui_analysis.fitfuncs.resonators import HangerResponseBruno  # noqa: F401  # Required for side effects
 
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestServicer  # type: ignore
-from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType  # type: ignore
+from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType, FitParameter  # type: ignore
 
 
 from hwman.services import Service
 from hwman.hw_tests.res_spec import res_spec
-from hwman.hw_tests.utils import setup_measurement_env
+from hwman.hw_tests.utils import setup_measurement_env, generate_id
 
 logger = logging.getLogger(__name__)
 
@@ -124,11 +124,33 @@ class TestService(Service, TestServicer):
 
     def cleanup(self) -> None: ...
 
-    def ResSpecCal(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
-        logger.info("ResSpecCal called")
-        res_spec(self.conf)
-        logger.info("ResSpecCal finished")
+    @staticmethod
+    def _assemble_fit_params(fit_result) -> dict:
+        """Convert lmfit ModelResult to protobuf FitParameter format."""
+        fit_params = {}
+        for name, param in fit_result.params.items():
+            fit_params[name] = FitParameter(
+                name=name,
+                value=param.value,
+                error=param.stderr if param.stderr is not None else 0.0
+            )
+        return fit_params
 
-        return TestResponse(status=True)
+
+    def ResSpecCal(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+        job_id = request.pid
+        if job_id is None or "":
+            job_id = generate_id()
+        logger.info("ResSpecCal called")
+
+        try:
+            loc, fit_result, snr = res_spec(self.conf, job_id)
+            logger.info("ResSpecCal finished")
+            fit_params = self._assemble_fit_params(fit_result)
+
+            return TestResponse(pid=job_id, status=True, data_path=str(loc), snr=snr, fit_parameters=fit_params)
+        except Exception as e:
+            logger.error(e)
+            return TestResponse(status=False, data_path=str(self.data_dir), pid=job_id)
 
 
