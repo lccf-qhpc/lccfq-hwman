@@ -229,13 +229,13 @@ class Client:
             logger.error(f"Failed to start test: {e}")
             return None
 
-    def start_teff_calculation(self) -> str | None:
+    def start_res_spec_vs_gain(self) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
-            self.test_stub.CalculateTeff(
+            ret = self.test_stub.ResSpecVsGainCal(
                 TestRequest()
             )
-            return None
+            return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
             return None

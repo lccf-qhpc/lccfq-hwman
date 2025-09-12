@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 class PlotItem:
     x: Any
     y: Any
+    z: Any = None  # For 2D colorbar plots
+    plot_type: str = "line"  # "line" or "colorbar"
     kwargs: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -62,7 +64,23 @@ def _plot_worker(plot_spec: PlotSpec):
             ax.set_ylabel(plot_spec.ylabel)
 
         for plot_item in plot_spec.plots:
-            ax.plot(plot_item.x, plot_item.y, **plot_item.kwargs)
+            if plot_item.plot_type == "colorbar":
+                # For colorbar plots, x and y are coordinates, z is the values
+                # Extract colorbar-specific kwargs
+                colorbar_kwargs = {}
+                plot_kwargs = plot_item.kwargs.copy()
+                if 'colorbar_label' in plot_kwargs:
+                    colorbar_kwargs['label'] = plot_kwargs.pop('colorbar_label')
+                
+                im = ax.pcolormesh(plot_item.x, plot_item.y, plot_item.z, **plot_kwargs)
+                cbar = fig.colorbar(im, ax=ax)
+                
+                # Apply colorbar label if provided
+                if 'label' in colorbar_kwargs:
+                    cbar.set_label(colorbar_kwargs['label'])
+            else:
+                # Default line plot
+                ax.plot(plot_item.x, plot_item.y, **plot_item.kwargs)
 
         if plot_spec.legend:
             ax.legend()
@@ -74,19 +92,6 @@ def _plot_worker(plot_spec: PlotSpec):
         print(f"Error in plotting worker: {e}")
         return False
 
-def create_plot_in_process(plot_spec: PlotSpec):
-    """
-    Create plot using multiprocessing pool. This is the preferred method.
-    :param plot_spec: A PlotSpec object defining the plot.
-    """
-    try:
-        pool = _get_plotting_pool()
-        result = pool.apply_async(_plot_worker, (plot_spec,))
-        success = result.get(timeout=30)
-        return success
-    except Exception as e:
-        logger.error(f"Error in process pool plotting: {e}")
-        return False
 
 def create_plot_in_subprocess(plot_spec: PlotSpec):
     """
@@ -108,6 +113,8 @@ import matplotlib.pyplot as plt
 class PlotItem:
     x: Any
     y: Any
+    z: Any = None  # For 2D colorbar plots
+    plot_type: str = "line"  # "line" or "colorbar"
     kwargs: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass
@@ -132,7 +139,23 @@ try:
     if spec.ylabel:
         ax.set_ylabel(spec.ylabel)
     for item in spec.plots:
-        ax.plot(item.x, item.y, **item.kwargs)
+        if item.plot_type == "colorbar":
+            # For colorbar plots, x and y are coordinates, z is the values
+            # Extract colorbar-specific kwargs
+            colorbar_kwargs = {{}}
+            plot_kwargs = item.kwargs.copy()
+            if 'colorbar_label' in plot_kwargs:
+                colorbar_kwargs['label'] = plot_kwargs.pop('colorbar_label')
+            
+            im = ax.pcolormesh(item.x, item.y, item.z, **plot_kwargs)
+            cbar = fig.colorbar(im, ax=ax)
+            
+            # Apply colorbar label if provided
+            if 'label' in colorbar_kwargs:
+                cbar.set_label(colorbar_kwargs['label'])
+        else:
+            # Default line plot
+            ax.plot(item.x, item.y, **item.kwargs)
     if spec.legend:
         ax.legend()
     fig.savefig(spec.plot_path, dpi=300, bbox_inches='tight')
