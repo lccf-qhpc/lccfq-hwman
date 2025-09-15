@@ -172,7 +172,7 @@ except Exception as e:
         if result.returncode == 0 and "SUCCESS" in result.stdout:
             return True
         else:
-            logger.error(f"Plotting subprocess failed: {result.stderr}")
+            logger.error(f"Plotting subprocess failed: {result.stderr} \n result.stdout: {result.stdout}")
             return False
     except subprocess.TimeoutExpired:
         logger.error("Plotting subprocess timed out")

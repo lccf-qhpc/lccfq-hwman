@@ -14,6 +14,7 @@ from hwman.utils.plotting import (
     PlotSpec,
     PlotItem,
 )
+from hwman.utils.fitting import fit_in_subprocess, FitSpec
 
 from qcui_measurement.qick.single_transmon_v2 import FreqSweepProgram
 from qcui_analysis.fitfuncs.resonators import HangerResponseBruno
@@ -61,39 +62,24 @@ def _fit_and_snr(data: DataDict):
     freqs = data["freq"]["values"]
     signal = data["signal_unwind"]["values"]
 
-    fit = HangerResponseBruno(freqs, signal)
-    fit_result = fit.run(fit)
-    fit_curve = fit_result.eval()
-    residuals = signal - fit_curve
+    fit_spec = FitSpec(
+        coordinates=freqs,
+        data=signal,
+        fit_class=HangerResponseBruno
+    )
 
-    amp = fit_result.params["A"].value
-    noise = np.std(residuals)
-    snr = amp/noise
+    result = fit_in_subprocess(fit_spec)
+    print("what are you result", result)
+    if result is None:
+        raise RuntimeError("Fitting failed in subprocess")
 
-    return fit_result, residuals, snr
+    return result
 
 
-def analyze_res_spec(loc: Path):
-
-    logger.info("Starting to analyze Resonator Spec")
-
-    if not loc.exists():
-        msg = f"Location {loc} does not exist"
-        raise FileNotFoundError(msg)
-
-    data = datadict_from_hdf5(loc/"data.ddh5")
-
-    data = add_mag_and_unwind(data)
-
-    fit_result, residuals, snr = _fit_and_snr(data)
-
-    # FIXME: This should be a settable option instead of having it done every single time
-
+def plot_res_spec(data, fit_result, plot_path):
     freqs = data["freq"]["values"]
     signal = data["signal_unwind"]["values"]
     fit_curve = fit_result.eval()
-    plot_filename = f"resonator_spec_fit.png"
-    plot_path = loc / plot_filename
 
     # Create plot using the new generic utility
     plot_spec = PlotSpec(
@@ -108,6 +94,23 @@ def analyze_res_spec(loc: Path):
         ]
     )
     create_plot_in_subprocess(plot_spec)
+
+
+def analyze_res_spec(loc: Path):
+
+    logger.info("Starting to analyze Resonator Spec")
+
+    if not loc.exists():
+        msg = f"Location {loc} does not exist"
+        raise FileNotFoundError(msg)
+
+    data = datadict_from_hdf5(loc/"data.ddh5")
+
+    data = add_mag_and_unwind(data)
+    fit_result, residuals, snr = _fit_and_snr(data)
+    plot_res_spec(data, fit_result, loc/"res_spec_vs_freq.png")
+
+    # FIXME: This should be a settable option instead of having it done every single time
 
     logger.info("Finished analyzing Resonator Spec")
 

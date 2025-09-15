@@ -3,8 +3,10 @@ from pathlib import Path
 
 import numpy as np
 
-from hwman.hw_tests.utils import QickConfig
+from hwman.hw_tests.res_spec import add_mag_and_unwind, _fit_and_snr, plot_res_spec
 from hwman.utils.plotting import PlotSpec, PlotItem, create_plot_in_subprocess
+from labcore.analysis import DatasetAnalysis
+from labcore.data.datadict import DataDict
 from labcore.measurement.storage import run_and_save_sweep
 from labcore.data.datadict_storage import datadict_from_hdf5
 from qcui_measurement.qick.single_transmon_v2 import FreqGainSweepProgram
@@ -23,9 +25,9 @@ def measure_res_spec_vs_gain(job_id: str):
     return loc, da
 
 
-def analyze_res_spec(loc: Path):
+def analyze_res_spec_vs_gain(loc: Path):
 
-    logger.info("Starting to analyze Resonator Spec")
+    logger.info("Starting to analyze Resonator Spec Vs Gain")
 
     if not loc.exists():
         msg = f"Location {loc} does not exist"
@@ -33,48 +35,39 @@ def analyze_res_spec(loc: Path):
 
     data = datadict_from_hdf5(loc/"data.ddh5")
 
-    data = add_mag_and_unwind(data)
+    image_path = loc / "resonator_spec_vs_gain.png"
 
-    fit_result, residuals, snr = _fit_and_snr(data)
+    # TODO: One can probably optimize the code such that you don't need to calculate the magnitude here and in the
+    #   individual traces.
+    # Create magnitude colorbar plot
+    plot_res_spec_vs_gain_mag(data, image_path)
 
-    # FIXME: This should be a settable option instead of having it done every single time
+    # Go through each trace and fit individually.
+    res_f_arr = []
+    for i, g in enumerate(data["gain"]["values"][0]):
+        trace_signal = data["signal"]["values"].T[i]  # Transpose to achieve gain as axis 0 instead of freq.
+        freqs = data["freq"]["values"].T[i]
 
-    freqs = data["freq"]["values"]
-    signal = data["signal_unwind"]["values"]
-    fit_curve = fit_result.eval()
-    plot_filename = f"resonator_spec_fit.png"
-    plot_path = loc / plot_filename
+        trace_dd = DataDict(signal=dict(unit=data["signal"]["unit"], axes=["freq"]), freq=dict(unit=data["freq"]["unit"]))
+        trace_dd.add_data(signal=trace_signal, freq=freqs)
 
-    # Create plot using the new generic utility
-    plot_spec = PlotSpec(
-        plot_path=str(plot_path),
-        title="Resonator Fit",
-        xlabel="Frequency (MHz)",
-        ylabel="Signal (A.U.)",
-        legend=True,
-        plots=[
-            PlotItem(x=freqs, y=np.abs(signal), kwargs={'label': 'Data'}),
-            PlotItem(x=freqs, y=np.abs(fit_curve), kwargs={'label': 'Fit'}),
-        ]
-    )
-    create_plot_in_subprocess(plot_spec)
+        with DatasetAnalysis(loc, f"resonator_spec_vs_gain_g={g}_i={i}") as ds:
+            unwind_data = add_mag_and_unwind(trace_dd)
+            fit_result, residuals, snr = _fit_and_snr(unwind_data)
+            savefolders = ds.savefolders
+
+        for f in savefolders:
+            plot_res_spec(unwind_data, fit_result, f/f"res_spec_vs_gain_g={g}_i={i}.png")
+
 
     logger.info("Finished analyzing Resonator Spec")
 
-def plot_magnitude_colorbar(loc: Path):
+def plot_res_spec_vs_gain_mag(data: DataDict, image_path: Path) -> None:
     """
-    Load data and create a colorbar plot of the magnitude data.
-    Similar to hvplot.quadmesh() but using our subprocess plotting system.
+    Plots a color mesh plot of resonator spectroscopy vs gain
     """
     logger.info("Creating magnitude colorbar plot")
-    
-    if not loc.exists():
-        msg = f"Location {loc} does not exist"
-        raise FileNotFoundError(msg)
-    
-    # Load the data
-    data = datadict_from_hdf5(loc/"data.ddh5")
-    
+
     # Calculate magnitude using the correct method
     mag = np.abs(data["signal"]["values"])
     
@@ -101,13 +94,10 @@ def plot_magnitude_colorbar(loc: Path):
         plot_type="colorbar",
         kwargs={"cmap": "viridis", "colorbar_label": "Magnitude (A.U.)"}
     )
-    
-    plot_filename = "magnitude_colorbar.png"
-    plot_path = loc / plot_filename
-    
+
     plot_spec = PlotSpec(
-        plot_path=str(plot_path),
-        title="Signal Magnitude",
+        plot_path=str(image_path),
+        title="Resonator Spectroscopy vs Gain Magnitude",
         xlabel="Frequency (MHz)",
         ylabel="Gain",
         plots=[colorbar_item]
@@ -116,7 +106,7 @@ def plot_magnitude_colorbar(loc: Path):
     success = create_plot_in_subprocess(plot_spec)
     
     if success:
-        logger.info(f"Magnitude colorbar plot saved to {plot_path}")
+        logger.info(f"Magnitude colorbar plot saved to {str(image_path)}")
     else:
         logger.error("Failed to create magnitude colorbar plot")
     
@@ -125,9 +115,6 @@ def plot_magnitude_colorbar(loc: Path):
 
 def res_spec_vs_gain(job_id: str):
     loc, da = measure_res_spec_vs_gain(job_id)
-    # fit_result, residuals, snr = analyze_res_spec(loc)
-    
-    # Create magnitude colorbar plot
-    plot_magnitude_colorbar(loc)
+    ret = analyze_res_spec_vs_gain(loc)
     
     return loc, da
