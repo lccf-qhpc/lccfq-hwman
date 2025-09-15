@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 
 from hwman.hw_tests.res_spec import add_mag_and_unwind, _fit_and_snr, plot_res_spec
+from hwman.utils.fitting import serialize_params
 from hwman.utils.plotting import PlotSpec, PlotItem, create_plot_in_subprocess
 from labcore.analysis import DatasetAnalysis
 from labcore.data.datadict import DataDict
@@ -51,13 +52,17 @@ def analyze_res_spec_vs_gain(loc: Path):
         trace_dd = DataDict(signal=dict(unit=data["signal"]["unit"], axes=["freq"]), freq=dict(unit=data["freq"]["unit"]))
         trace_dd.add_data(signal=trace_signal, freq=freqs)
 
-        with DatasetAnalysis(loc, f"resonator_spec_vs_gain_g={g}_i={i}") as ds:
+        folder_name = f"resonator_spec_vs_gain_i={i}_g={g}"
+        with DatasetAnalysis(loc, folder_name) as ds:
             unwind_data = add_mag_and_unwind(trace_dd)
             fit_result, residuals, snr = _fit_and_snr(unwind_data)
+            params = serialize_params(fit_result.params)
+            params["snr"] = snr
+            ds.add(params=params)
             savefolders = ds.savefolders
 
         for f in savefolders:
-            plot_res_spec(unwind_data, fit_result, f/f"res_spec_vs_gain_g={g}_i={i}.png")
+            plot_res_spec(unwind_data, fit_result, f/(folder_name + ".png"))
 
 
     logger.info("Finished analyzing Resonator Spec")
