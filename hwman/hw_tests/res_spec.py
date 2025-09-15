@@ -69,7 +69,6 @@ def _fit_and_snr(data: DataDict):
     )
 
     result = fit_in_subprocess(fit_spec)
-    print("what are you result", result)
     if result is None:
         raise RuntimeError("Fitting failed in subprocess")
 

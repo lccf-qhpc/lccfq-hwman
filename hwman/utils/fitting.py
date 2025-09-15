@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, Tuple
 
 import numpy as np
+import lmfit
 
 logger = logging.getLogger(__name__)
 
@@ -133,3 +134,7 @@ except Exception as e:
             os.unlink(output_path)
         except OSError:
             pass
+
+
+def serialize_params(params: lmfit.Parameters):
+    return {n: dict(value=v.value, error=v.stderr) for n, v in params.items()}
