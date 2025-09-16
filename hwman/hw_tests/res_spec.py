@@ -3,7 +3,7 @@ from pathlib import Path
 
 import numpy as np
 
-from labcore.analysis import FitResult
+from labcore.analysis import FitResult, DatasetAnalysis
 from labcore.data.datadict import DataDict
 from labcore.data.datadict_storage import datadict_from_hdf5
 from labcore.measurement.storage import run_and_save_sweep
@@ -14,7 +14,7 @@ from hwman.utils.plotting import (
     PlotSpec,
     PlotItem,
 )
-from hwman.utils.fitting import fit_in_subprocess, FitSpec
+from hwman.utils.fitting import fit_in_subprocess, FitSpec, serialize_params
 
 from qcui_measurement.qick.single_transmon_v2 import FreqSweepProgram
 from qcui_analysis.fitfuncs.resonators import HangerResponseBruno
@@ -105,9 +105,16 @@ def analyze_res_spec(loc: Path):
 
     data = datadict_from_hdf5(loc/"data.ddh5")
 
-    data = add_mag_and_unwind(data)
-    fit_result, residuals, snr = _fit_and_snr(data)
-    plot_res_spec(data, fit_result, loc/"res_spec_vs_freq.png")
+    with DatasetAnalysis(loc, "resonator_spec") as ds:
+        data = add_mag_and_unwind(data)
+        fit_result, residuals, snr = _fit_and_snr(data)
+        params = serialize_params(fit_result.params)
+        params["snr"] = snr
+        ds.add(fit_params=params)
+        datafolders = ds.savefolders
+
+    for f in datafolders:
+        plot_res_spec(data, fit_result, f/"res_spec_vs_freq.png")
 
     # FIXME: This should be a settable option instead of having it done every single time
 
