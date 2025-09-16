@@ -44,8 +44,9 @@ def analyze_res_spec_vs_gain(loc: Path):
     plot_res_spec_vs_gain_mag(data, image_path)
 
     # Go through each trace and fit individually.
+    gains = data["gain"]["values"][0]
     res_f_arr = []
-    for i, g in enumerate(data["gain"]["values"][0]):
+    for i, g in enumerate(gains):
         trace_signal = data["signal"]["values"].T[i]  # Transpose to achieve gain as axis 0 instead of freq.
         freqs = data["freq"]["values"].T[i]
 
@@ -63,9 +64,39 @@ def analyze_res_spec_vs_gain(loc: Path):
 
         for f in savefolders:
             plot_res_spec(unwind_data, fit_result, f/(folder_name + ".png"))
+        logger.info("plots saved")
+        res_f_arr.append(params["f_0"]["value"])
 
+    slope = (res_f_arr[len(res_f_arr) - 1] - res_f_arr[0]) / (gains[len(res_f_arr) - 1] - gains[0])
+    diff = []
+    for g, f in zip(gains, res_f_arr):
+        val = slope * (g - gains[0]) + res_f_arr[0]
+        diff.append(np.abs(f - val))
+
+    # Create gain vs resonance frequency plot
+    gain_vs_freq_path = loc / "gain_vs_freq_change.png"
+    plot_spec = PlotSpec(
+        plot_path=str(gain_vs_freq_path),
+        title="Gain vs Resonator Frequency",
+        xlabel="Gain",
+        ylabel="Resonance Frequency (MHz)",
+        legend=True,
+        plots=[
+            PlotItem(x=gains, y=res_f_arr, kwargs={'marker': '.', 'linestyle': '-', 'label': 'Data'}),
+            PlotItem(x=[gains[0], gains[-1]], y=[res_f_arr[0], res_f_arr[-1]], kwargs={'label': 'Linear Fit'}),
+            PlotItem(x=[gains[np.argmax(diff)], gains[np.argmax(diff)]], y=[min(res_f_arr), max(res_f_arr)], kwargs={'linestyle': '--', 'color': 'red', 'label': 'Max Deviation'})
+        ]
+    )
+
+    success = create_plot_in_subprocess(plot_spec)
+    if success:
+        logger.info(f"Gain vs frequency plot saved to {str(gain_vs_freq_path)}")
+    else:
+        logger.error("Failed to create gain vs frequency plot")
 
     logger.info("Finished analyzing Resonator Spec")
+
+    return gains[np.argmax(diff)]
 
 def plot_res_spec_vs_gain_mag(data: DataDict, image_path: Path) -> None:
     """
@@ -120,6 +151,7 @@ def plot_res_spec_vs_gain_mag(data: DataDict, image_path: Path) -> None:
 
 def res_spec_vs_gain(job_id: str):
     loc, da = measure_res_spec_vs_gain(job_id)
-    ret = analyze_res_spec_vs_gain(loc)
+    gain = analyze_res_spec_vs_gain(loc)
+    logger.info("gain should be set to %s", float(gain))
     
     return loc, da

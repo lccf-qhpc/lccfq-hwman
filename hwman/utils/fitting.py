@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from typing import Any, Dict, Tuple
 
 import numpy as np
-import lmfit
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +68,7 @@ try:
     # Calculate SNR
     amp = fit_result.params["A"].value
     noise = np.std(residuals)
-    snr = amp/noise
+    snr = amp/(4*noise)
 
     # Save results
     result = {{
@@ -136,5 +135,5 @@ except Exception as e:
             pass
 
 
-def serialize_params(params: lmfit.Parameters):
+def serialize_params(params):
     return {n: dict(value=v.value, error=v.stderr) for n, v in params.items()}
