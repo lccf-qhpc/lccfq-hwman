@@ -1,0 +1,661 @@
+{
+  "components": {
+    "parameter_manager": {
+      "__class__": "instrumentserver.params.ParameterManager",
+      "functions": {},
+      "label": "parameter_manager",
+      "name": "parameter_manager",
+      "parameters": {},
+      "submodules": {
+        "msmt": {
+          "__class__": "instrumentserver.params.ParameterManager",
+          "functions": {},
+          "label": "msmt",
+          "name": "msmt",
+          "parameters": {
+            "final_delay": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "msmt_final_delay",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "msmt",
+              "inter_delay": 0,
+              "label": "final_delay",
+              "name": "final_delay",
+              "post_delay": 0,
+              "raw_value": 300,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "us",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 300
+            },
+            "reps": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "msmt_reps",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "msmt",
+              "inter_delay": 0,
+              "label": "reps",
+              "name": "reps",
+              "post_delay": 0,
+              "raw_value": 600,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 600
+            },
+            "soft_avgs": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "msmt_soft_avgs",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "msmt",
+              "inter_delay": 0,
+              "label": "soft_avgs",
+              "name": "soft_avgs",
+              "post_delay": 0,
+              "raw_value": 1,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 1
+            },
+            "steps": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "msmt_steps",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "msmt",
+              "inter_delay": 0,
+              "label": "steps",
+              "name": "steps",
+              "post_delay": 0,
+              "raw_value": 300,
+              "ts": "2025-09-03 11:20:17",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 300
+            },
+            "steps2": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "msmt_steps2",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "msmt",
+              "inter_delay": 0,
+              "label": "steps2",
+              "name": "steps2",
+              "post_delay": 0,
+              "raw_value": 11,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 11
+            },
+            "trig_time": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "msmt_trig_time",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "msmt",
+              "inter_delay": 0,
+              "label": "trig_time",
+              "name": "trig_time",
+              "post_delay": 0,
+              "raw_value": 0.47,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "us",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0.47
+            }
+          },
+          "submodules": {}
+        },
+        "qubit": {
+          "__class__": "instrumentserver.params.ParameterManager",
+          "functions": {},
+          "label": "qubit",
+          "name": "qubit",
+          "parameters": {
+            "T1": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_T1",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "T1",
+              "name": "T1",
+              "post_delay": 0,
+              "raw_value": 35.90277149564693,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "us",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 35.90277149564693
+            },
+            "T2E": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_T2E",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "T2E",
+              "name": "T2E",
+              "post_delay": 0,
+              "raw_value": 100,
+              "ts": "2025-09-03 11:20:12",
+              "unit": "us",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 100
+            },
+            "T2R": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_T2R",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "T2R",
+              "name": "T2R",
+              "post_delay": 0,
+              "raw_value": 100,
+              "ts": "2025-09-03 11:20:13",
+              "unit": "us",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 100
+            },
+            "c_len": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_c_len",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "c_len",
+              "name": "c_len",
+              "post_delay": 0,
+              "raw_value": 100,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "us",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 100
+            },
+            "dac_ch": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_dac_ch",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "dac_ch",
+              "name": "dac_ch",
+              "post_delay": 0,
+              "raw_value": 1,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 1
+            },
+            "detuning": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_detuning",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "detuning",
+              "name": "detuning",
+              "post_delay": 0,
+              "raw_value": 0.05,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "MHz",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0.05
+            },
+            "end_ge_f": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_end_ge_f",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "end_ge_f",
+              "name": "end_ge_f",
+              "post_delay": 0,
+              "raw_value": 3470,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "MHz",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 3470
+            },
+            "end_ge_g": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_end_ge_g",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "end_ge_g",
+              "name": "end_ge_g",
+              "post_delay": 0,
+              "raw_value": 1,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 1
+            },
+            "f_ge": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_f_ge",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "f_ge",
+              "name": "f_ge",
+              "post_delay": 0,
+              "raw_value": 3451.867663289221,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "MHz",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 3451.867663289221
+            },
+            "gain": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_gain",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "gain",
+              "name": "gain",
+              "post_delay": 0,
+              "raw_value": 0.6433831980130419,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0.6433831980130419
+            },
+            "mixer_f": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_mixer_f",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "mixer_f",
+              "name": "mixer_f",
+              "post_delay": 0,
+              "raw_value": 0,
+              "ts": "2025-09-03 09:42:12",
+              "unit": "MHz",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0
+            },
+            "n_echo": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_n_echo",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "n_echo",
+              "name": "n_echo",
+              "post_delay": 0,
+              "raw_value": 0,
+              "ts": "2025-09-03 11:20:17",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0
+            },
+            "nqz": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_nqz",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "nqz",
+              "name": "nqz",
+              "post_delay": 0,
+              "raw_value": 2,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 2
+            },
+            "phase": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_phase",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "phase",
+              "name": "phase",
+              "post_delay": 0,
+              "raw_value": 0,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "degree",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0
+            },
+            "sigma": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_sigma",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "sigma",
+              "name": "sigma",
+              "post_delay": 0,
+              "raw_value": 0.2,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "us",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0.2
+            },
+            "start_ge_f": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_start_ge_f",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "start_ge_f",
+              "name": "start_ge_f",
+              "post_delay": 0,
+              "raw_value": 3440,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "MHz",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 3440
+            },
+            "start_ge_g": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "qubit_start_ge_g",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "qubit",
+              "inter_delay": 0,
+              "label": "start_ge_g",
+              "name": "start_ge_g",
+              "post_delay": 0,
+              "raw_value": -1,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": -1
+            }
+          },
+          "submodules": {}
+        },
+        "readout": {
+          "__class__": "instrumentserver.params.ParameterManager",
+          "functions": {},
+          "label": "readout",
+          "name": "readout",
+          "parameters": {
+            "adc_ch": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_adc_ch",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "adc_ch",
+              "name": "adc_ch",
+              "post_delay": 0,
+              "raw_value": 0,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0
+            },
+            "dac_ch": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_dac_ch",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "dac_ch",
+              "name": "dac_ch",
+              "post_delay": 0,
+              "raw_value": 0,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0
+            },
+            "end_f": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_end_f",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "end_f",
+              "name": "end_f",
+              "post_delay": 0,
+              "raw_value": 7138.2802297970065,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "MHz",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 7138.2802297970065
+            },
+            "end_g": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_end_g",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "end_g",
+              "name": "end_g",
+              "post_delay": 0,
+              "raw_value": 0.7,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0.7
+            },
+            "f_res": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_f_res",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "f_res",
+              "name": "f_res",
+              "post_delay": 0,
+              "raw_value": 7133.136609128931,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "MHz",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 7133.136609128931
+            },
+            "gain": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_gain",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "gain",
+              "name": "gain",
+              "post_delay": 0,
+              "raw_value": 0.44994811695049747,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0.44994811695049747
+            },
+            "length": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_length",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "length",
+              "name": "length",
+              "post_delay": 0,
+              "raw_value": 5,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "us",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 5
+            },
+            "nqz": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_nqz",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "nqz",
+              "name": "nqz",
+              "post_delay": 0,
+              "raw_value": 2,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 2
+            },
+            "phase": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_phase",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "phase",
+              "name": "phase",
+              "post_delay": 0,
+              "raw_value": 0,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "degree",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0
+            },
+            "start_f": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_start_f",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "start_f",
+              "name": "start_f",
+              "post_delay": 0,
+              "raw_value": 7128.2802297970065,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "MHz",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 7128.2802297970065
+            },
+            "start_g": {
+              "__class__": "qcodes.parameters.parameter.Parameter",
+              "full_name": "readout_start_g",
+              "instrument": "instrumentserver.params.ParameterManager",
+              "instrument_name": "readout",
+              "inter_delay": 0,
+              "label": "start_g",
+              "name": "start_g",
+              "post_delay": 0,
+              "raw_value": 0.2,
+              "ts": "2025-09-03 11:20:01",
+              "unit": "",
+              "validators": [
+                "<Anything>"
+              ],
+              "vals": "<Anything>",
+              "value": 0.2
+            }
+          },
+          "submodules": {}
+        }
+      }
+    }
+  },
+  "config": {
+    "instruments": {
+      "parameter_manager": {
+        "type": "instrumentserver.params.ParameterManager"
+      }
+    }
+  },
+  "instruments": {},
+  "parameters": {}
+}

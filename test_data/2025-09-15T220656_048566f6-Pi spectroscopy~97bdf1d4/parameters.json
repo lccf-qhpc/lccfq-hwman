@@ -1,0 +1,138 @@
+{
+  "parameter_manager.msmt.final_delay": {
+    "unit": "us",
+    "value": 300
+  },
+  "parameter_manager.msmt.reps": {
+    "unit": "",
+    "value": 600
+  },
+  "parameter_manager.msmt.soft_avgs": {
+    "unit": "",
+    "value": 1
+  },
+  "parameter_manager.msmt.steps": {
+    "unit": "",
+    "value": 250
+  },
+  "parameter_manager.msmt.steps2": {
+    "unit": "",
+    "value": 11
+  },
+  "parameter_manager.msmt.trig_time": {
+    "unit": "us",
+    "value": 0.47
+  },
+  "parameter_manager.qubit.T1": {
+    "unit": "us",
+    "value": 1
+  },
+  "parameter_manager.qubit.T2E": {
+    "unit": "us",
+    "value": 2
+  },
+  "parameter_manager.qubit.T2R": {
+    "unit": "us",
+    "value": 1
+  },
+  "parameter_manager.qubit.c_len": {
+    "unit": "us",
+    "value": 100
+  },
+  "parameter_manager.qubit.dac_ch": {
+    "unit": "",
+    "value": 1
+  },
+  "parameter_manager.qubit.detuning": {
+    "unit": "MHz",
+    "value": 0.05
+  },
+  "parameter_manager.qubit.end_ge_f": {
+    "unit": "MHz",
+    "value": 3456.872161514198
+  },
+  "parameter_manager.qubit.end_ge_g": {
+    "unit": "",
+    "value": 1
+  },
+  "parameter_manager.qubit.f_ge": {
+    "unit": "MHz",
+    "value": 3451.872161514198
+  },
+  "parameter_manager.qubit.gain": {
+    "unit": "",
+    "value": 0.6433831980130419
+  },
+  "parameter_manager.qubit.mixer_f": {
+    "unit": "MHz",
+    "value": 0
+  },
+  "parameter_manager.qubit.n_echo": {
+    "unit": "",
+    "value": 1
+  },
+  "parameter_manager.qubit.nqz": {
+    "unit": "",
+    "value": 2
+  },
+  "parameter_manager.qubit.phase": {
+    "unit": "degree",
+    "value": 0
+  },
+  "parameter_manager.qubit.sigma": {
+    "unit": "us",
+    "value": 0.2
+  },
+  "parameter_manager.qubit.start_ge_f": {
+    "unit": "MHz",
+    "value": 3446.872161514198
+  },
+  "parameter_manager.qubit.start_ge_g": {
+    "unit": "",
+    "value": -1
+  },
+  "parameter_manager.readout.adc_ch": {
+    "unit": "",
+    "value": 0
+  },
+  "parameter_manager.readout.dac_ch": {
+    "unit": "",
+    "value": 0
+  },
+  "parameter_manager.readout.end_f": {
+    "unit": "MHz",
+    "value": 7138.2802297970065
+  },
+  "parameter_manager.readout.end_g": {
+    "unit": "",
+    "value": 0.7
+  },
+  "parameter_manager.readout.f_res": {
+    "unit": "MHz",
+    "value": 7133.2802297970065
+  },
+  "parameter_manager.readout.gain": {
+    "unit": "",
+    "value": 0.44994811695049747
+  },
+  "parameter_manager.readout.length": {
+    "unit": "us",
+    "value": 5
+  },
+  "parameter_manager.readout.nqz": {
+    "unit": "",
+    "value": 2
+  },
+  "parameter_manager.readout.phase": {
+    "unit": "degree",
+    "value": 0
+  },
+  "parameter_manager.readout.start_f": {
+    "unit": "MHz",
+    "value": 7128.2802297970065
+  },
+  "parameter_manager.readout.start_g": {
+    "unit": "",
+    "value": 0.2
+  }
+}
