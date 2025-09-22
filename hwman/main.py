@@ -26,6 +26,7 @@ class Server:
         ns_host: str = "localhost",
         ns_port: int = 8888,
         data_dir: str | Path = "./data",
+        fake_calibration_data: bool = False,
         start_external_services: bool = True,
     ):
         self.address = address
@@ -37,6 +38,8 @@ class Server:
         self.ns_host = ns_host
         self.ns_port = ns_port
         self.start_external_services = start_external_services
+
+        self.fake_calibration_data = fake_calibration_data
 
         self.server_cert: bytes | None = None
         self.server_key: bytes | None = None
@@ -101,7 +104,7 @@ class Server:
             self.health_service._start_qick_server()
 
         logger.info("Initializing test service...")
-        self.test_service = TestService(self.data_dir)
+        self.test_service = TestService(self.data_dir, fake_calibration_data=self.fake_calibration_data)
         test_pb2_grpc.add_TestServicer_to_server(self.test_service, self.server)
         self.test_service._start()
 

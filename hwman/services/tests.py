@@ -43,10 +43,11 @@ logger = logging.getLogger(__name__)
 class TestService(Service, TestServicer):
     NUMBER_OF_RETRIES = 10
 
-    def __init__(self, data_dir: Path, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, data_dir: Path, fake_calibration_data: bool = False, *args: Any, **kwargs: Any) -> None:
         logger.info("Initializing TestService")
         super().__init__(*args, **kwargs)
         self.data_dir = data_dir
+        self.fake_calibration_data = fake_calibration_data
 
     def _start(self) -> None:
         try:
@@ -147,7 +148,7 @@ class TestService(Service, TestServicer):
         logger.info("ResSpecCal called")
 
         try:
-            loc, fit_result, snr = res_spec(job_id)
+            loc, fit_result, snr = res_spec(job_id, fake_calibration_data=self.fake_calibration_data)
             logger.info("ResSpecCal finished")
             fit_params = self._assemble_fit_params(fit_result)
 
@@ -162,7 +163,7 @@ class TestService(Service, TestServicer):
             job_id = generate_id()
         logger.info("ResSPecVs called")
 
-        ret = res_spec_vs_gain(job_id)
+        ret = res_spec_vs_gain(job_id, fake_calibration_data=self.fake_calibration_data)
         logger.info("ResSPecVs finished")
         return TestResponse(status=True)
 

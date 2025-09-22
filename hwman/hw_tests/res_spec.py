@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+import shutil
 
 import numpy as np
 
@@ -23,6 +24,7 @@ from hwman.hw_tests.utils import generate_id
 
 logger = logging.getLogger(__name__)
 
+FAKEDATA = Path("test_data/2025-09-15T220651_316ab9b2-resonator_spec~3180264c")
 
 def measure_res_spec(job_id: str | None):
 
@@ -122,8 +124,21 @@ def analyze_res_spec(loc: Path):
 
     return fit_result, residuals, snr
 
-def res_spec(job_id: str) -> tuple[Path, FitResult, float]:
+def res_spec(job_id: str, fake_calibration_data: bool = False) -> tuple[Path, FitResult, float]:
     loc, da = measure_res_spec(job_id)
+    if fake_calibration_data:
+        # Rename the measured data.ddh5 to empty_measured.ddh5
+        measured_data_path = loc / "data.ddh5"
+        if measured_data_path.exists():
+            shutil.move(str(measured_data_path), str(loc / "empty_measured.ddh5"))
+
+        # Copy the fake data.ddh5 from FAKEDATA to loc
+        fake_data_path = FAKEDATA / "data.ddh5"
+        if fake_data_path.exists():
+            shutil.copy2(str(fake_data_path), str(loc / "data.ddh5"))
+        else:
+            raise FileNotFoundError(f"Fake data file not found at {fake_data_path}")
+
     fit_result, residuals, snr = analyze_res_spec(loc)
     return loc, fit_result, snr
 
