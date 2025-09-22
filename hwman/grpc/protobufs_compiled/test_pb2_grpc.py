@@ -49,6 +49,11 @@ class TestStub(object):
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
+        self.SatSpec = channel.unary_unary(
+                '/Test/SatSpec',
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
+                _registered_method=True)
 
 
 class TestServicer(object):
@@ -72,6 +77,12 @@ class TestServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SatSpec(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TestServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -87,6 +98,11 @@ def add_TestServicer_to_server(servicer, server):
             ),
             'ResSpecVsGainCal': grpc.unary_unary_rpc_method_handler(
                     servicer.ResSpecVsGainCal,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.SerializeToString,
+            ),
+            'SatSpec': grpc.unary_unary_rpc_method_handler(
+                    servicer.SatSpec,
                     request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.SerializeToString,
             ),
@@ -170,6 +186,33 @@ class Test(object):
             request,
             target,
             '/Test/ResSpecVsGainCal',
+            hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def SatSpec(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Test/SatSpec',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
