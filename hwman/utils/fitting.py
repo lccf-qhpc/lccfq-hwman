@@ -93,7 +93,7 @@ except Exception as e:
     with open('{output_path}', 'wb') as f:
         pickle.dump(error_result, f)
 
-    print(f"FIT_ERROR: {{e}}")
+    print(f"FIT_ERROR: {{e}}, {{type(e)}}")
 '''
 
     try:

@@ -239,3 +239,14 @@ class Client:
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
             return None
+
+    def start_sat_spec(self) -> str | None:
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            ret = self.test_stub.SatSpec(
+                TestRequest()
+            )
+            return ret
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start test: {e}")
+            return None

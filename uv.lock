@@ -574,6 +574,19 @@ wheels = [
 ]
 
 [[package]]
+name = "hvsampledata"
+version = "0.1.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "platformdirs" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d0/26/eb6eba0a32295854e0b7f081b0ffd19c4d8312b7338a4e40640110ab4ab0/hvsampledata-0.1.4.tar.gz", hash = "sha256:36eb75a46a8ad77cae4fa51ca1d24abb0ebb3804239614d219b725ec23729597", size = 234057, upload-time = "2025-08-01T02:12:58.029Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/eb/85bcf0aef73d399f6d5bc187d502c9d0fc7d4de32c2f43c19849eb1c0f82/hvsampledata-0.1.4-py3-none-any.whl", hash = "sha256:990bdfc3070b45bcf1d78ffa46edc3316ac4a1aa1bf5ea9e484585ee757cb5b9", size = 224311, upload-time = "2025-08-01T02:12:56.156Z" },
+]
+
+[[package]]
 name = "idna"
 version = "3.10"
 source = { registry = "https://pypi.org/simple" }
@@ -837,6 +850,7 @@ dependencies = [
     { name = "grpcio-tools" },
     { name = "h5py" },
     { name = "hvplot" },
+    { name = "hvsampledata" },
     { name = "instrumentserver" },
     { name = "labcore" },
     { name = "lmfit" },
@@ -878,6 +892,7 @@ requires-dist = [
     { name = "grpcio-tools", specifier = ">=1.71.0" },
     { name = "h5py", specifier = ">=3.13.0" },
     { name = "hvplot", specifier = ">=0.12.0" },
+    { name = "hvsampledata", specifier = ">=0.1.4" },
     { name = "instrumentserver", editable = "../instrumentserver" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=6.0.1" },
     { name = "labcore", editable = "../labcore" },

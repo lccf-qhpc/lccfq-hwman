@@ -11,6 +11,7 @@ import Pyro4
 import grpc
 
 from hwman.hw_tests.res_spec_vs_gain import res_spec_vs_gain
+from hwman.hw_tests.sat_spec import sat_spec
 from labcore.measurement.storage import run_and_save_sweep
 
 from qcui_measurement.qick.single_transmon_v2 import (
@@ -167,3 +168,12 @@ class TestService(Service, TestServicer):
         logger.info("ResSPecVs finished")
         return TestResponse(status=True)
 
+    def SatSpec(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+        job_id = request.pid
+        if job_id is None or job_id == "":
+            job_id = generate_id()
+
+        logger.info("SatSpec called")
+        ret = sat_spec(job_id, fake_calibration_data=self.fake_calibration_data)
+        logger.info("SatSpec finished")
+        return TestResponse(status=True)
