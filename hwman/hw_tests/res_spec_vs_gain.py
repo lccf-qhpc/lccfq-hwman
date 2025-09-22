@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+import shutil
 
 import numpy as np
 
@@ -13,6 +14,8 @@ from labcore.data.datadict_storage import datadict_from_hdf5
 from qcui_measurement.qick.single_transmon_v2 import FreqGainSweepProgram
 
 logger = logging.getLogger(__name__)
+
+FAKEDATA = Path("test_data/2025-09-15T220653_32e06a30-resonator_spec_vs_gain~f98b5786")
 
 
 def measure_res_spec_vs_gain(job_id: str):
@@ -149,9 +152,22 @@ def plot_res_spec_vs_gain_mag(data: DataDict, image_path: Path) -> None:
     return success
 
 
-def res_spec_vs_gain(job_id: str):
+def res_spec_vs_gain(job_id: str, fake_calibration_data: bool = False):
     loc, da = measure_res_spec_vs_gain(job_id)
+    if fake_calibration_data:
+        # Rename the measured data.ddh5 to empty_measured.ddh5
+        measured_data_path = loc / "data.ddh5"
+        if measured_data_path.exists():
+            shutil.move(str(measured_data_path), str(loc / "empty_measured.ddh5"))
+
+        # Copy the fake data.ddh5 from FAKEDATA to loc
+        fake_data_path = FAKEDATA / "data.ddh5"
+        if fake_data_path.exists():
+            shutil.copy2(str(fake_data_path), str(loc / "data.ddh5"))
+        else:
+            raise FileNotFoundError(f"Fake data file not found at {fake_data_path}")
+
     gain = analyze_res_spec_vs_gain(loc)
     logger.info("gain should be set to %s", float(gain))
-    
+
     return loc, da

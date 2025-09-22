@@ -120,6 +120,9 @@ def start(
     start_external_services: Annotated[
         bool, typer.Option("-se", help="Start external services")
     ] = True,
+    fake_calibration_data: Annotated[
+        bool, typer.Option("-fk", help="Overwrite calibration measurements with test_data instead of measured values")
+    ] = False,
 ) -> None:
     """Start the hardware management server."""
 
@@ -161,6 +164,7 @@ def start(
             ns_host=ns_host,
             ns_port=ns_port,
             start_external_services=start_external_services,
+            fake_calibration_data=fake_calibration_data,
         )
 
         # Initialize certificates
