@@ -44,6 +44,9 @@ service Test {
     rpc PowerRabi(TestRequest) returns (TestResponse);
     rpc PiSpec(TestRequest) returns (TestResponse);
     rpc ResSpecAfterPi(TestRequest) returns (TestResponse);
+    rpc T1(TestRequest) returns (TestResponse);
+    rpc T2R(TestRequest) returns (TestResponse);
+    rpc T2E(TestRequest) returns (TestResponse);
 }
 
 
