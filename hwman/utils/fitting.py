@@ -68,7 +68,7 @@ try:
     # Calculate SNR
     amp = fit_result.params["A"].value
     noise = np.std(residuals)
-    snr = amp/(4*noise)
+    snr = np.abs(amp/(4*noise))
 
     # Save results
     result = {{
