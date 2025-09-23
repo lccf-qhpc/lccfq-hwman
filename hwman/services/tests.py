@@ -12,6 +12,7 @@ import grpc
 
 from hwman.hw_tests.pi_spec import pi_spec
 from hwman.hw_tests.power_rabi import power_rabi
+from hwman.hw_tests.res_spec_after_pi import res_spec_after_pi
 from hwman.hw_tests.res_spec_vs_gain import res_spec_vs_gain
 from hwman.hw_tests.sat_spec import sat_spec
 from labcore.measurement.storage import run_and_save_sweep
@@ -198,4 +199,14 @@ class TestService(Service, TestServicer):
         logger.info("PiSpec called")
         ret = pi_spec(job_id, fake_calibration_data=self.fake_calibration_data)
         logger.info("PiSpec finished")
+        return TestResponse(status=True)
+
+    def ResSpecAfterPi(self, request, context):
+        job_id = request.pid
+        if job_id is None or job_id == "":
+            job_id = generate_id()
+
+        logger.info("ResSpecAfterPi called")
+        ret = res_spec_after_pi(job_id, fake_calibration_data=self.fake_calibration_data)
+        logger.info("ResSpecAfterPi finished")
         return TestResponse(status=True)
