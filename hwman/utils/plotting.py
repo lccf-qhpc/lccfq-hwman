@@ -21,7 +21,7 @@ class PlotItem:
     x: Any
     y: Any
     z: Any = None  # For 2D colorbar plots
-    plot_type: str = "line"  # "line" or "colorbar"
+    plot_type: str = "line"  # "line", "scatter", or "colorbar"
     kwargs: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -71,13 +71,16 @@ def _plot_worker(plot_spec: PlotSpec):
                 plot_kwargs = plot_item.kwargs.copy()
                 if 'colorbar_label' in plot_kwargs:
                     colorbar_kwargs['label'] = plot_kwargs.pop('colorbar_label')
-                
+
                 im = ax.pcolormesh(plot_item.x, plot_item.y, plot_item.z, **plot_kwargs)
                 cbar = fig.colorbar(im, ax=ax)
-                
+
                 # Apply colorbar label if provided
                 if 'label' in colorbar_kwargs:
                     cbar.set_label(colorbar_kwargs['label'])
+            elif plot_item.plot_type == "scatter":
+                # Scatter plot
+                ax.scatter(plot_item.x, plot_item.y, **plot_item.kwargs)
             else:
                 # Default line plot
                 ax.plot(plot_item.x, plot_item.y, **plot_item.kwargs)
@@ -114,7 +117,7 @@ class PlotItem:
     x: Any
     y: Any
     z: Any = None  # For 2D colorbar plots
-    plot_type: str = "line"  # "line" or "colorbar"
+    plot_type: str = "line"  # "line", "scatter", or "colorbar"
     kwargs: Dict[str, Any] = field(default_factory=dict)
 
 @dataclass
@@ -146,13 +149,16 @@ try:
             plot_kwargs = item.kwargs.copy()
             if 'colorbar_label' in plot_kwargs:
                 colorbar_kwargs['label'] = plot_kwargs.pop('colorbar_label')
-            
+
             im = ax.pcolormesh(item.x, item.y, item.z, **plot_kwargs)
             cbar = fig.colorbar(im, ax=ax)
-            
+
             # Apply colorbar label if provided
             if 'label' in colorbar_kwargs:
                 cbar.set_label(colorbar_kwargs['label'])
+        elif item.plot_type == "scatter":
+            # Scatter plot
+            ax.scatter(item.x, item.y, **item.kwargs)
         else:
             # Default line plot
             ax.plot(item.x, item.y, **item.kwargs)
