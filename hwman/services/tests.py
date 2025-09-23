@@ -10,6 +10,8 @@ import Pyro4
 
 import grpc
 
+from hwman.hw_tests.pi_spec import pi_spec
+from hwman.hw_tests.power_rabi import power_rabi
 from hwman.hw_tests.res_spec_vs_gain import res_spec_vs_gain
 from hwman.hw_tests.sat_spec import sat_spec
 from labcore.measurement.storage import run_and_save_sweep
@@ -176,4 +178,24 @@ class TestService(Service, TestServicer):
         logger.info("SatSpec called")
         ret = sat_spec(job_id, fake_calibration_data=self.fake_calibration_data)
         logger.info("SatSpec finished")
+        return TestResponse(status=True)
+
+    def PowerRabi(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+        job_id = request.pid
+        if job_id is None or job_id == "":
+            job_id = generate_id()
+
+        logger.info("PowerRabi called")
+        ret = power_rabi(job_id, fake_calibration_data=self.fake_calibration_data)
+        logger.info("PowerRabi finished")
+        return TestResponse(status=True)
+
+    def PiSpec(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+        job_id = request.pid
+        if job_id is None or job_id == "":
+            job_id = generate_id()
+
+        logger.info("PiSpec called")
+        ret = pi_spec(job_id, fake_calibration_data=self.fake_calibration_data)
+        logger.info("PiSpec finished")
         return TestResponse(status=True)
