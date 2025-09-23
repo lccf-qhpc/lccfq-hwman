@@ -281,3 +281,33 @@ class Client:
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
+
+    def start_t1(self) -> str | None:
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            ret = self.test_stub.T1(
+                TestRequest()
+            )
+            return ret
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start test: {e}")
+
+    def start_t2r(self) -> str | None:
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            ret = self.test_stub.T2R(
+                TestRequest()
+            )
+            return ret
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start test: {e}")
+
+    def start_t2e(self) -> str | None:
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            ret = self.test_stub.T2E(
+                TestRequest()
+            )
+            return ret
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start test: {e}")

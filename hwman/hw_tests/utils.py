@@ -5,10 +5,13 @@ from typing import Any
 from instrumentserver.client import Client
 
 import labcore.instruments.qick.qick_sweep_v2 as qick_sweep_v2
+from instrumentserver.client.proxy import ProxyInstrumentModule
 from labcore.instruments.qick.config import QBoardConfig
 from qick.asm_v2 import QickSweep1D
 
 logger = logging.getLogger(__name__)
+
+_params = None
 
 def generate_id():
     return str(uuid.uuid4())[:8]
@@ -105,11 +108,12 @@ class QickConfig(QBoardConfig):
 
 
 def setup_measurement_env() -> QickConfig:
-
+    global _params
     logger.debug("Getting instrumentserver client")
     instruments = Client()
     logger.debug("Getting parameter manager proxy")
     params = instruments.get_instrument("parameter_manager")
+    _params = params
 
     conf = QickConfig(
         params=params,
@@ -118,3 +122,10 @@ def setup_measurement_env() -> QickConfig:
     )
     qick_sweep_v2.config = conf  # type: ignore[assignment]
     return conf
+
+
+def get_params() -> ProxyInstrumentModule:
+    global _params
+    if _params is not None:
+        return _params
+    raise Exception("params is not set yet")

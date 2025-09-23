@@ -15,6 +15,8 @@ from hwman.hw_tests.power_rabi import power_rabi
 from hwman.hw_tests.res_spec_after_pi import res_spec_after_pi
 from hwman.hw_tests.res_spec_vs_gain import res_spec_vs_gain
 from hwman.hw_tests.sat_spec import sat_spec
+from hwman.hw_tests.t1 import t1
+from hwman.hw_tests.t2x import t2x
 from labcore.measurement.storage import run_and_save_sweep
 
 from qcui_measurement.qick.single_transmon_v2 import (
@@ -209,4 +211,34 @@ class TestService(Service, TestServicer):
         logger.info("ResSpecAfterPi called")
         ret = res_spec_after_pi(job_id, fake_calibration_data=self.fake_calibration_data)
         logger.info("ResSpecAfterPi finished")
+        return TestResponse(status=True)
+
+    def T1(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+        job_id = request.pid
+        if job_id is None or job_id == "":
+            job_id = generate_id()
+
+        logger.info("T1 called")
+        ret = t1(job_id, fake_calibration_data=self.fake_calibration_data)
+        logger.info("T1 finished")
+        return TestResponse(status=True)
+
+    def T2R(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+        job_id = request.pid
+        if job_id is None or job_id == "":
+            job_id = generate_id()
+
+        logger.info("T2R called")
+        ret = t2x(job_id, n_echos=0, fake_calibration_data=self.fake_calibration_data)
+        logger.info("T2R finished")
+        return TestResponse(status=True)
+
+    def T2E(self, request, context):
+        job_id = request.pid
+        if job_id is None or job_id == "":
+            job_id = generate_id()
+
+        logger.info("T2E called")
+        ret = t2x(job_id, n_echos=3, fake_calibration_data=self.fake_calibration_data)
+        logger.info("T2E finished")
         return TestResponse(status=True)

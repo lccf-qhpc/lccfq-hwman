@@ -69,7 +69,7 @@
   },
   "parameter_manager.qubit.n_echo": {
     "unit": "",
-    "value": 1
+    "value": 0
   },
   "parameter_manager.qubit.nqz": {
     "unit": "",
