@@ -54,6 +54,16 @@ class TestStub(object):
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
+        self.PowerRabi = channel.unary_unary(
+                '/Test/PowerRabi',
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
+                _registered_method=True)
+        self.PiSpec = channel.unary_unary(
+                '/Test/PiSpec',
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
+                _registered_method=True)
 
 
 class TestServicer(object):
@@ -83,6 +93,18 @@ class TestServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def PowerRabi(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def PiSpec(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_TestServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -105,6 +127,16 @@ def add_TestServicer_to_server(servicer, server):
                     servicer.SatSpec,
                     request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.SerializeToString,
+            ),
+            'PowerRabi': grpc.unary_unary_rpc_method_handler(
+                    servicer.PowerRabi,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
+            ),
+            'PiSpec': grpc.unary_unary_rpc_method_handler(
+                    servicer.PiSpec,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -215,6 +247,60 @@ class Test(object):
             '/Test/SatSpec',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def PowerRabi(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Test/PowerRabi',
+            hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def PiSpec(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Test/PiSpec',
+            hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
             options,
             channel_credentials,
             insecure,

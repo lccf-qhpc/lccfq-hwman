@@ -41,6 +41,8 @@ service Test {
     rpc ResSpecCal(TestRequest) returns (TestResponse);
     rpc ResSpecVsGainCal(TestRequest) returns (TestResponse);
     rpc SatSpec(TestRequest) returns (TestResponse);
+    rpc PowerRabi(TestRequest) returns (TestRequest);
+    rpc PiSpec(TestRequest) returns (TestRequest);
 }
 
 
