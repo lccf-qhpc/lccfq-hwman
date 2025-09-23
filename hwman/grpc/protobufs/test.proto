@@ -47,6 +47,7 @@ service Test {
     rpc T1(TestRequest) returns (TestResponse);
     rpc T2R(TestRequest) returns (TestResponse);
     rpc T2E(TestRequest) returns (TestResponse);
+    rpc ROCal(TestRequest) returns (TestResponse);
 }
 
 

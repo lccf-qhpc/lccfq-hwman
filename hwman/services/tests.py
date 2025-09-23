@@ -14,6 +14,7 @@ from hwman.hw_tests.pi_spec import pi_spec
 from hwman.hw_tests.power_rabi import power_rabi
 from hwman.hw_tests.res_spec_after_pi import res_spec_after_pi
 from hwman.hw_tests.res_spec_vs_gain import res_spec_vs_gain
+from hwman.hw_tests.ro_cal import ro_cal
 from hwman.hw_tests.sat_spec import sat_spec
 from hwman.hw_tests.t1 import t1
 from hwman.hw_tests.t2x import t2x
@@ -233,7 +234,7 @@ class TestService(Service, TestServicer):
         logger.info("T2R finished")
         return TestResponse(status=True)
 
-    def T2E(self, request, context):
+    def T2E(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
         job_id = request.pid
         if job_id is None or job_id == "":
             job_id = generate_id()
@@ -241,4 +242,14 @@ class TestService(Service, TestServicer):
         logger.info("T2E called")
         ret = t2x(job_id, n_echos=3, fake_calibration_data=self.fake_calibration_data)
         logger.info("T2E finished")
+        return TestResponse(status=True)
+
+    def ROCal(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+        job_id = request.pid
+        if job_id is None or job_id == "":
+            job_id = generate_id()
+
+        logger.info("ROCal called")
+        ret = ro_cal(job_id, fake_calibration_data=self.fake_calibration_data)
+        logger.info("ROCal finished")
         return TestResponse(status=True)
