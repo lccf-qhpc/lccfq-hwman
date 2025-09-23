@@ -7,10 +7,10 @@ authors = [
     {name = "Marcos Frenkel", email = "marcosf2@illinois.edu"}
 ]
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = "==3.12.*"
 dependencies = [
     "gitpython>=3.1.44",
-    "grpcio-tools>=1.71.0",
+    "grpcio-tools==1.66.0",
     "h5py>=3.13.0",
     "labcore",
     "pandas>=2.2.3",
