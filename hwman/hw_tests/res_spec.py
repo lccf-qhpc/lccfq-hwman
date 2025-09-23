@@ -122,7 +122,7 @@ def analyze_res_spec(loc: Path):
 
     logger.info("Finished analyzing Resonator Spec")
 
-    return fit_result, residuals, snr
+    return fit_result, residuals, snr, data
 
 def res_spec(job_id: str, fake_calibration_data: bool = False) -> tuple[Path, FitResult, float]:
     loc, da = measure_res_spec(job_id)
@@ -139,7 +139,7 @@ def res_spec(job_id: str, fake_calibration_data: bool = False) -> tuple[Path, Fi
         else:
             raise FileNotFoundError(f"Fake data file not found at {fake_data_path}")
 
-    fit_result, residuals, snr = analyze_res_spec(loc)
+    fit_result, residuals, snr, unwind_data = analyze_res_spec(loc)
     return loc, fit_result, snr
 
 

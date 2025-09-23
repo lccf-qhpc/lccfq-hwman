@@ -271,3 +271,13 @@ class Client:
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
+
+    def start_res_spec_after_pi(self) -> str | None:
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            ret = self.test_stub.ResSpecAfterPi(
+                TestRequest()
+            )
+            return ret
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start test: {e}")

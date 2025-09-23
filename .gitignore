@@ -194,6 +194,7 @@ GEMINI.md
 */data/*
 *.json
 data/
+analysis/
 
 # Allow test_data directory contents to be committed
 !test_data/
