@@ -20,7 +20,7 @@ from hwman.utils.plotting import (
 from hwman.utils.fitting import fit_in_subprocess, FitSpec, serialize_params
 
 
-from hwman.hw_tests.utils import generate_id
+from hwman.hw_tests.utils import generate_id, TestReturn, DataType
 
 logger = logging.getLogger(__name__)
 
@@ -115,16 +115,17 @@ def analyze_res_spec(loc: Path):
         ds.add(fit_params=params)
         savefolders = ds.savefolders
 
-    for f in savefolders:
+    image_paths = [f/"res_spec_vs_freq.png" for f in savefolders]
+    for f in image_paths:
         plot_res_spec(data, fit_result, f/"res_spec_vs_freq.png")
 
     # FIXME: This should be a settable option instead of having it done every single time
 
     logger.info("Finished analyzing Resonator Spec")
 
-    return fit_result, residuals, snr, data
+    return fit_result, residuals, snr, data, image_paths
 
-def res_spec(job_id: str, fake_calibration_data: bool = False) -> tuple[Path, FitResult, float]:
+def res_spec(job_id: str, fake_calibration_data: bool = False) -> TestReturn:
     loc, da = measure_res_spec(job_id)
     if fake_calibration_data:
         # Rename the measured data.ddh5 to empty_measured.ddh5
@@ -139,8 +140,11 @@ def res_spec(job_id: str, fake_calibration_data: bool = False) -> tuple[Path, Fi
         else:
             raise FileNotFoundError(f"Fake data file not found at {fake_data_path}")
 
-    fit_result, residuals, snr, unwind_data = analyze_res_spec(loc)
-    return loc, fit_result, snr
+    fit_result, residuals, snr, unwind_data, image_paths = analyze_res_spec(loc)
+    ret = TestReturn(data_type=DataType.MAG,
+                     data_path=loc, fit_result=fit_result,
+                     snr=snr, images=image_paths)
+    return ret
 
 
 
