@@ -5,9 +5,7 @@ import time
 
 import numpy as np
 
-from labcore.analysis import DatasetAnalysis
 from labcore.data.datadict import DataDict
-from labcore.data.datadict_storage import datadict_from_hdf5
 from labcore.measurement.storage import run_and_save_sweep
 
 from qcui_measurement.qick.single_transmon_v2 import FreqSweepProgram
@@ -17,25 +15,12 @@ from hwman.utils.plotting import (
     PlotSpec,
     PlotItem,
 )
-from hwman.hw_tests.res_spec import add_mag_and_unwind, _fit_and_snr, plot_res_spec, analyze_res_spec, measure_res_spec
-from hwman.hw_tests.utils import generate_id
+from hwman.hw_tests.res_spec import analyze_res_spec, measure_res_spec
 
 logger = logging.getLogger(__name__)
 
 FAKEDATABEFORE = Path("test_data/2025-09-15T220657_941fe156-Res_spec_readout_pre_pi~f5669779")
 FAKEDATAAFTER = Path("test_data/2025-09-15T220658_2689d6ce-Res_spec_readout_post_pi~e19a85a2")
-
-
-# def measure_res_spec_before_pi(job_id: str):
-#     """Measure resonator spectroscopy before pi pulse"""
-#     logger.info("Starting resonator spectroscopy before pi for {}".format(job_id))
-#
-#     sweep = FreqSweepProgram()
-#     logger.debug("Sweep created, running measurement")
-#     loc, da = run_and_save_sweep(sweep, "data", f"resonator_spec_before_pi~{job_id}", return_data=True)
-#     logger.info("Measurement done, data in %s", loc)
-#
-#     return loc, da
 
 
 def measure_res_spec_after_pi_pulse(job_id: str):
@@ -124,8 +109,8 @@ def res_spec_after_pi(job_id: str, fake_calibration_data: bool = False):
             raise FileNotFoundError(f"Fake data file not found at {fake_data_path}")
 
     # Analyze both measurements using res_spec functions
-    fit_result_before, residuals_before, snr_before, unwind_data_before = analyze_res_spec(loc_before)
-    fit_result_after, residuals_after, snr_after, unwind_data_after = analyze_res_spec(loc_after)
+    fit_result_before, residuals_before, snr_before, unwind_data_before, image_paths = analyze_res_spec(loc_before)
+    fit_result_after, residuals_after, snr_after, unwind_data_after, image_paths = analyze_res_spec(loc_after)
 
 
     # Get f_0 values from fit parameters

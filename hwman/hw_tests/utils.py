@@ -1,17 +1,37 @@
 import uuid
 import logging
 from typing import Any
+from pathlib import Path
+from enum import Enum, auto
+from dataclasses import dataclass
 
 from instrumentserver.client import Client
-
-import labcore.instruments.qick.qick_sweep_v2 as qick_sweep_v2
 from instrumentserver.client.proxy import ProxyInstrumentModule
-from labcore.instruments.qick.config import QBoardConfig
+
 from qick.asm_v2 import QickSweep1D
+from labcore.analysis import FitResult
+from labcore.instruments.qick import qick_sweep_v2
+from labcore.instruments.qick.config import QBoardConfig
 
 logger = logging.getLogger(__name__)
 
 _params = None
+
+
+class DataType(Enum):
+    REAL = auto()
+    IMAG = auto()
+    MAG = auto()
+
+
+@dataclass
+class TestReturn:
+    data_type: DataType
+    data_path: Path
+    fit_result: FitResult
+    snr: float
+    images: list[Path]
+
 
 def generate_id():
     return str(uuid.uuid4())[:8]
