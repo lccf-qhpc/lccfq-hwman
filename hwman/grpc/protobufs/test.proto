@@ -48,6 +48,5 @@ service Test {
     rpc T2R(TestRequest) returns (TestResponse);
     rpc T2E(TestRequest) returns (TestResponse);
     rpc ROCal(TestRequest) returns (TestResponse);
+    rpc TuneUpProtocol(TestRequest) returns (TestResponse);
 }
-
-
