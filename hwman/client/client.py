@@ -321,3 +321,13 @@ class Client:
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
+
+    def start_tuneup_protocol(self):
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            ret = self.test_stub.TuneUpProtocol(
+                TestRequest()
+            )
+            return ret
+        except grpc.RpcError as e:
+            logger.error(f"Failed to start test: {e}")

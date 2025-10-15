@@ -7,6 +7,8 @@ from typing import Any
 from pathlib import Path
 import time
 import Pyro4
+import subprocess
+import sys
 
 import grpc
 
@@ -253,3 +255,33 @@ class TestService(Service, TestServicer):
         ret = ro_cal(job_id, fake_calibration_data=self.fake_calibration_data)
         logger.info("ROCal finished")
         return TestResponse(status=True)
+
+    def TuneUpProtocol(self, request, context):
+        logger.info("TuneUpProtocol called")
+        job_id = request.pid
+        if job_id is None or job_id == "":
+            job_id = generate_id()
+
+        # Run the tuneup protocol in a subprocess to avoid gRPC fork issues
+        # Use the standalone script that runs independently
+        script_path = Path(__file__).parent.parent / "hw_tests" / "run_tuneup.py"
+
+        try:
+            result = subprocess.run(
+                [sys.executable, str(script_path)],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            logger.info(f"TuneUpProtocol subprocess completed successfully")
+            if result.stdout:
+                logger.info(f"Subprocess output: {result.stdout}")
+            if result.stderr:
+                logger.warning(f"Subprocess stderr: {result.stderr}")
+
+            return TestResponse(status=True, pid=job_id)
+        except subprocess.CalledProcessError as e:
+            logger.error(f"TuneUpProtocol subprocess failed with exit code {e.returncode}")
+            logger.error(f"Subprocess stdout: {e.stdout}")
+            logger.error(f"Subprocess stderr: {e.stderr}")
+            return TestResponse(status=False, pid=job_id)
