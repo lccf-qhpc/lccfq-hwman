@@ -1,0 +1,36 @@
+# hwman Configuration File
+# This is an example configuration file for the hardware manager.
+# Copy this to config.toml and customize for your setup.
+
+# Server settings
+server_address = "localhost"
+server_port = 50001
+log_level = "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+# Certificate settings
+cert_dir = "./certs"
+
+# InstrumentServer settings
+instrumentserver_config_file = "./configs/serverConfig.yml"
+instrumentserver_params_file = "./configs/parameter_manager-parameter_manager.json"
+
+# Pyro nameserver settings (for QICK communication)
+pyro_proxy_name = "rfsoc"  # Must match QICK configuration
+pyro_ns_host = "localhost"
+pyro_ns_port = 8888
+
+# QICK server settings (SSH connection to QICK board)
+# Use an SSH alias configured in ~/.ssh/config for the QICK board connection
+qick_ssh_host = "qick_board"    # SSH alias or hostname for the QICK board
+qick_ssh_password = "xilinx"    # SSH/sudo password for the QICK board
+qick_remote_path = "/home/xilinx/jupyter_notebooks/qick/pyro4"
+qick_board = "ZCU216"
+qick_virtual_env = "/usr/local/share/pynq-venv"
+qick_xilinx_xrt = "/usr"
+
+# Data settings
+data_dir = "./data"
+fake_calibration_data = false  # Set to true for testing without hardware
+
+# Service startup
+start_external_services = true  # Start instrumentserver, nameserver, and QICK server on startup
