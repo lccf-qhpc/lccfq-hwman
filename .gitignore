@@ -188,9 +188,6 @@ cython_debug/
 *.tag
 *.ddh5
 
-# ai agents
-GEMINI.md
-
 */data/*
 *.json
 data/
@@ -199,3 +196,6 @@ analysis/
 # Allow test_data directory contents to be committed
 !test_data/
 !test_data/**/*
+
+# Current configuration
+config.toml

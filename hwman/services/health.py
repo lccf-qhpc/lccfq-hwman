@@ -34,6 +34,12 @@ class HealthService(Service, HealthServicer):
         proxy_ns_name: str = "rfsoc",
         ns_host: str = "localhost",
         ns_port: int = 8888,
+        qick_ssh_host: str = "",
+        qick_ssh_password: str = "",
+        qick_remote_path: str = "/home/xilinx/jupyter_notebooks/qick/pyro4",
+        qick_board: str = "ZCU216",
+        qick_virtual_env: str = "/usr/local/share/pynq-venv",
+        qick_xilinx_xrt: str = "/usr",
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -45,6 +51,12 @@ class HealthService(Service, HealthServicer):
         :param proxy_ns_name: Name of the Pyro nameserver proxy. Needs to match the QICK configuration.
         :param ns_host: Host of the Pyro nameserver. Should be the computer running the nameserver's IP address or hostname.
         :param ns_port: Port of the Pyro nameserver. Should match the port used by the QICK configuration.
+        :param qick_ssh_host: SSH alias or hostname for the QICK board (e.g., 'qick_board').
+        :param qick_ssh_password: SSH/sudo password for QICK board (leave empty if not needed).
+        :param qick_remote_path: Path to QICK pyro4 directory on remote board.
+        :param qick_board: BOARD environment variable for QICK.
+        :param qick_virtual_env: Virtual environment path on remote board.
+        :param qick_xilinx_xrt: XILINX_XRT path on remote board.
         :param args: Passed to the parent class HealthServicer.
         :param kwargs: Passed to the parent class HealthServicer.
         """
@@ -58,6 +70,13 @@ class HealthService(Service, HealthServicer):
         self.ns_port = ns_port
         self.pyro_nameserver_process: subprocess.Popen | None = None
 
+        # QICK server settings
+        self.qick_ssh_host = qick_ssh_host
+        self.qick_ssh_password = qick_ssh_password
+        self.qick_remote_path = qick_remote_path
+        self.qick_board = qick_board
+        self.qick_virtual_env = qick_virtual_env
+        self.qick_xilinx_xrt = qick_xilinx_xrt
         self.qick_server_process: subprocess.Popen | None = None
 
         super().__init__(*args, **kwargs)
@@ -371,18 +390,25 @@ class HealthService(Service, HealthServicer):
         if self.qick_server_process and self.qick_server_process.poll() is None:
             return False, "Qick server is already running"
 
+        if not self.qick_ssh_host:
+            qick_server_logger.warning("QICK SSH host is not configured, skipping QICK server startup")
+            return False, "QICK SSH host not configured"
+
         try:
-            # Set the missing environment variables that are needed for QICK to work
-            # Use export to ensure they are available to sudo -E
+            # Build the remote command with configured environment variables
+            remote_cmd = (
+                f"cd {self.qick_remote_path} && "
+                f"export BOARD={self.qick_board} && "
+                f"export VIRTUAL_ENV={self.qick_virtual_env} && "
+                f"export XILINX_XRT={self.qick_xilinx_xrt} && "
+                f"export PATH={self.qick_virtual_env}/bin:$PATH && "
+                f"sudo -S -E {self.qick_virtual_env}/bin/python pyro_service.py"
+            )
+
             cmd = [
                 "ssh",
-                "qick_board",
-                "cd /home/xilinx/jupyter_notebooks/qick/pyro4 && "
-                "export BOARD=ZCU216 && "
-                "export VIRTUAL_ENV=/usr/local/share/pynq-venv && "
-                "export XILINX_XRT=/usr && "
-                "export PATH=/usr/local/share/pynq-venv/bin:$PATH && "
-                "sudo -S -E /usr/local/share/pynq-venv/bin/python pyro_service.py",
+                self.qick_ssh_host,
+                remote_cmd,
             ]
 
             self.qick_server_process = subprocess.Popen(
@@ -394,9 +420,11 @@ class HealthService(Service, HealthServicer):
                 text=True,
             )
 
+            # Send password via stdin
             if self.qick_server_process.stdin:
-                self.qick_server_process.stdin.write(f"{os.environ['QICK_PASSWORD']}\n")
+                self.qick_server_process.stdin.write(f"{self.qick_ssh_password}\n")
                 self.qick_server_process.stdin.flush()
+
             time.sleep(20)
             qick_server_logger.info("Qick server started successfully")
             return True, f"Qick server started with PID: {self.qick_server_process.pid}"
@@ -417,8 +445,8 @@ class HealthService(Service, HealthServicer):
 
             kill_cmd = [
                 "ssh",
-                "qick_board",
-                f"echo '{os.environ['QICK_PASSWORD']}' | sudo -S pkill -f 'pyro_service.py'",
+                self.qick_ssh_host,
+                "sudo pkill -f 'pyro_service.py'",
             ]
 
             kill_process = subprocess.Popen(
@@ -447,8 +475,8 @@ class HealthService(Service, HealthServicer):
                 )
                 force_kill_cmd = [
                     "ssh",
-                    "qick_board",
-                    f"echo '{os.environ['QICK_PASSWORD']}' | sudo -S pkill -9 -f 'pyro_service.py'",
+                    self.qick_ssh_host,
+                    "sudo pkill -9 -f 'pyro_service.py'",
                 ]
 
                 force_kill_process = subprocess.Popen(
@@ -489,7 +517,7 @@ class HealthService(Service, HealthServicer):
 
         # Check if the remote pyro_service.py processes are actually running
         try:
-            check_cmd = ["ssh", "qick_board", "pgrep -f 'pyro_service.py'"]
+            check_cmd = ["ssh", self.qick_ssh_host, "pgrep -f 'pyro_service.py'"]
 
             check_process = subprocess.Popen(
                 check_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True

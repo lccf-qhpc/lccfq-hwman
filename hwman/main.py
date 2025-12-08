@@ -1,10 +1,10 @@
 import logging
-from pathlib import Path
 from concurrent import futures
 
 import grpc
 
 from hwman.certificates.certificate_manager import CertificateManager
+from hwman.config import HwmanSettings
 from hwman.grpc.protobufs_compiled import health_pb2_grpc, test_pb2_grpc
 from hwman.services.health import HealthService
 from hwman.services.tests import TestService
@@ -12,40 +12,31 @@ from hwman.services.tests import TestService
 logger = logging.getLogger(__name__)
 
 
-# FIXME: The default values for these should be with their respective services, not in the main server class.
 class Server:
-    def __init__(
-        self,
-        address: str = "localhost",
-        port: int = 50001,
-        cert_dir: str | Path = "./certs",
-        instrumentserver_config_file: str | Path = "./configs/serverConfig.yml",
-        instrumentserver_params_file: str
-        | Path = "./configs/parameter_manager-parameter_manager.json",
-        proxy_ns_name: str = "rfsoc",
-        ns_host: str = "localhost",
-        ns_port: int = 8888,
-        data_dir: str | Path = "./data",
-        fake_calibration_data: bool = False,
-        start_external_services: bool = True,
-    ):
-        self.address = address
-        self.port = port
-        self.cert_dir = Path(cert_dir)
-        self.instrumentserver_config_file = Path(instrumentserver_config_file)
-        self.instrumentserver_params_file = Path(instrumentserver_params_file)
-        self.proxy_ns_name = proxy_ns_name
-        self.ns_host = ns_host
-        self.ns_port = ns_port
-        self.start_external_services = start_external_services
+    def __init__(self, config: HwmanSettings) -> None:
+        """Initialize the server with configuration.
 
-        self.fake_calibration_data = fake_calibration_data
+        Args:
+            config: HwmanSettings object with all server configuration
+        """
+        self.config = config
+
+        # Extract commonly used values for convenience
+        self.address = config.server_address
+        self.port = config.server_port
+        self.cert_dir = config.cert_dir
+        self.instrumentserver_config_file = config.instrumentserver_config_file
+        self.instrumentserver_params_file = config.instrumentserver_params_file
+        self.proxy_ns_name = config.pyro_proxy_name
+        self.ns_host = config.pyro_ns_host
+        self.ns_port = config.pyro_ns_port
+        self.start_external_services = config.start_external_services
+        self.fake_calibration_data = config.fake_calibration_data
+        self.data_dir = config.data_dir
 
         self.server_cert: bytes | None = None
         self.server_key: bytes | None = None
         self.ca_cert: bytes | None = None
-
-        self.data_dir = Path(data_dir)
 
         self.health_service: HealthService | None = None
         self.test_service: TestService | None = None
@@ -90,11 +81,17 @@ class Server:
 
         logger.info("Initializing health service...")
         self.health_service = HealthService(
-            self.instrumentserver_config_file,
-            self.instrumentserver_params_file,
-            self.proxy_ns_name,
-            self.ns_host,
-            self.ns_port,
+            config_file=self.instrumentserver_config_file,
+            instrumentserver_params_file=self.instrumentserver_params_file,
+            proxy_ns_name=self.proxy_ns_name,
+            ns_host=self.ns_host,
+            ns_port=self.ns_port,
+            qick_ssh_host=self.config.qick_ssh_host,
+            qick_ssh_password=self.config.qick_ssh_password,
+            qick_remote_path=self.config.qick_remote_path,
+            qick_board=self.config.qick_board,
+            qick_virtual_env=self.config.qick_virtual_env,
+            qick_xilinx_xrt=self.config.qick_xilinx_xrt,
         )
         health_pb2_grpc.add_HealthServicer_to_server(self.health_service, self.server)
 
