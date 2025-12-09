@@ -3,7 +3,7 @@ from concurrent import futures
 
 import grpc
 
-from hwman.certificates.certificate_manager import CertificateManager
+from hwman.certificate_manager import CertificateManager
 from hwman.config import HwmanSettings
 from hwman.grpc.protobufs_compiled import health_pb2_grpc, test_pb2_grpc
 from hwman.services.health import HealthService
