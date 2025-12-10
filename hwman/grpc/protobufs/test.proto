@@ -35,10 +35,17 @@ message TestResponse {
     map<string, FitParameter> fit_parameters = 5;
 }
 
+message ResSpecResponse {
+    string pid = 1;
+    bool status = 2;
+    double f = 3;
+    double error = 4;
+    double snr = 5;
+}
 
 service Test {
     rpc StandardTest(TestRequest) returns (TestResponse);
-    rpc ResSpecCal(TestRequest) returns (TestResponse);
+    rpc ResSpecCal(TestRequest) returns (ResSpecResponse);
     rpc ResSpecVsGainCal(TestRequest) returns (TestResponse);
     rpc SatSpec(TestRequest) returns (TestResponse);
     rpc PowerRabi(TestRequest) returns (TestResponse);

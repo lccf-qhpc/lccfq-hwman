@@ -689,6 +689,24 @@ wheels = [
 name = "instrumentserver"
 version = "0.0.1"
 source = { editable = "../instrumentserver" }
+dependencies = [
+    { name = "bokeh" },
+    { name = "pyqt5" },
+    { name = "qcodes" },
+    { name = "qtpy" },
+    { name = "scipy" },
+    { name = "zmq" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "bokeh" },
+    { name = "pyqt5" },
+    { name = "qcodes" },
+    { name = "qtpy" },
+    { name = "scipy" },
+    { name = "zmq" },
+]
 
 [[package]]
 name = "ipykernel"
@@ -1067,8 +1085,6 @@ dependencies = [
     { name = "h5py" },
     { name = "hvplot" },
     { name = "hvsampledata" },
-    { name = "instrumentserver" },
-    { name = "labcore" },
     { name = "lmfit" },
     { name = "pandas" },
     { name = "pydantic" },
@@ -1077,9 +1093,6 @@ dependencies = [
     { name = "pyro4" },
     { name = "python-dotenv" },
     { name = "qcodes" },
-    { name = "qcui-analysis" },
-    { name = "qcui-measurement" },
-    { name = "qick" },
     { name = "qtpy" },
     { name = "seaborn" },
     { name = "typer" },
@@ -1098,6 +1111,13 @@ dev = [
     { name = "mypy" },
     { name = "ruff" },
 ]
+hw-resources = [
+    { name = "instrumentserver" },
+    { name = "labcore" },
+    { name = "qcui-analysis" },
+    { name = "qcui-measurement" },
+    { name = "qick" },
+]
 labcore = [
     { name = "hvplot" },
     { name = "lmfit" },
@@ -1112,9 +1132,7 @@ requires-dist = [
     { name = "h5py", specifier = ">=3.13.0" },
     { name = "hvplot", specifier = ">=0.12.0" },
     { name = "hvsampledata", specifier = ">=0.1.4" },
-    { name = "instrumentserver", editable = "../instrumentserver" },
     { name = "isort", marker = "extra == 'dev'", specifier = ">=6.0.1" },
-    { name = "labcore", editable = "../labcore" },
     { name = "lmfit", specifier = ">=1.3.4" },
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "pydantic", specifier = ">=2.0.0" },
@@ -1123,9 +1141,6 @@ requires-dist = [
     { name = "pyro4", specifier = ">=4.82" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "qcodes", specifier = ">=0.53.0" },
-    { name = "qcui-analysis", editable = "../analysis" },
-    { name = "qcui-measurement", editable = "../measurement" },
-    { name = "qick", editable = "../qick" },
     { name = "qtpy", specifier = ">=2.4.3" },
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "typer", specifier = ">=0.15.0" },
@@ -1139,6 +1154,13 @@ dev = [
     { name = "jupyterlab", specifier = ">=4.4.9" },
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "ruff", specifier = ">=0.11.10" },
+]
+hw-resources = [
+    { name = "instrumentserver", editable = "../instrumentserver" },
+    { name = "labcore", editable = "../labcore" },
+    { name = "qcui-analysis", editable = "../analysis" },
+    { name = "qcui-measurement", editable = "../measurement" },
+    { name = "qick", editable = "../qick" },
 ]
 labcore = [
     { name = "hvplot", specifier = ">=0.12.0" },

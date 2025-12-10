@@ -42,7 +42,7 @@ class TestStub(object):
         self.ResSpecCal = channel.unary_unary(
                 '/Test/ResSpecCal',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
-                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.ResSpecResponse.FromString,
                 _registered_method=True)
         self.ResSpecVsGainCal = channel.unary_unary(
                 '/Test/ResSpecVsGainCal',
@@ -182,7 +182,7 @@ def add_TestServicer_to_server(servicer, server):
             'ResSpecCal': grpc.unary_unary_rpc_method_handler(
                     servicer.ResSpecCal,
                     request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
-                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.SerializeToString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.ResSpecResponse.SerializeToString,
             ),
             'ResSpecVsGainCal': grpc.unary_unary_rpc_method_handler(
                     servicer.ResSpecVsGainCal,
@@ -288,7 +288,7 @@ class Test(object):
             target,
             '/Test/ResSpecCal',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
-            hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
+            hwman_dot_grpc_dot_protobufs_dot_test__pb2.ResSpecResponse.FromString,
             options,
             channel_credentials,
             insecure,
