@@ -7,7 +7,7 @@ from hwman.grpc.protobufs_compiled.health_pb2_grpc import HealthStub  # type: ig
 from hwman.grpc.protobufs_compiled.health_pb2 import Ping, HealthRequest  # type: ignore
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestStub  # type: ignore
 from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestType  # type: ignore
-from hwman.certificates.certificate_manager import CertificateManager
+from hwman.certificate_manager import CertificateManager
 
 
 logger = logging.getLogger(__name__)

@@ -145,6 +145,16 @@ uv run jupyter lab
 
 ## Development Guidelines
 
+### Python Execution
+
+- **CRITICAL**: All Python commands must be run using `uv run` prefix
+- This ensures the correct virtual environment and dependencies are used
+- Examples:
+  - `uv run python script.py` (NOT `python script.py`)
+  - `uv run hwman start` (NOT `hwman start`)
+  - `uv run mypy hwman/` (NOT `mypy hwman/`)
+  - `uv run jupyter lab` (NOT `jupyter lab`)
+
 ### Code Style
 
 - **Type Hints**: Required for all function definitions (enforced by mypy with `disallow_untyped_defs`)
