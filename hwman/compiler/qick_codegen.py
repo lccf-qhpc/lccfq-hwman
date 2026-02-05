@@ -5,32 +5,25 @@ This module takes Circuit objects (containing Gate objects) and generates
 QICK program code. No lexer/parser needed - works directly with dataclasses.
 """
 
+from dataclasses import dataclass
 from typing import Optional, List
 import numpy as np
 
 # Import Circuit and Gate from the services module
 from hwman.services.circuits import Circuit
 from lccfq_backend.model.tasks import Gate
+from hwman.errors import UnsupportedGateError, CircuitMissingMeasurementError, TwoQubitGateNotImplementedError
 
 
+@dataclass
 class GateConfig:
     """Configuration for a quantum gate pulse."""
-
-    def __init__(
-        self,
-        pulse_type: str,  # 'gauss', 'const', etc.
-        phase: float = 0.0,
-        length: Optional[int] = None,
-        sigma: Optional[int] = None,
-        gain: Optional[int] = None,
-        freq_key: Optional[str] = None,  # e.g., 'q_ge', 'ro_freq'
-    ):
-        self.pulse_type = pulse_type
-        self.phase = phase
-        self.length = length
-        self.sigma = sigma
-        self.gain = gain
-        self.freq_key = freq_key
+    pulse_type: str  # 'gauss', 'const', etc.
+    phase: float = 0.0
+    length: Optional[int] = None
+    sigma: Optional[int] = None
+    gain: Optional[int] = None
+    freq_key: Optional[str] = None  # e.g., 'q_ge', 'ro_freq'
 
 
 # Standard gate definitions
@@ -88,6 +81,30 @@ class QICKProgramGenerator:
         self.unique_qubits = self._get_unique_qubits()
         self.pulse_counter = 0
 
+    def validate(self) -> None:
+        """
+        Validate the circuit before code generation.
+
+        Raises:
+            UnsupportedGateError: If a gate symbol is not in GATE_LIBRARY
+        """
+        has_measure_gate = False
+        for gate in self.gates:
+
+            if len(gate.control_qubits) != 0:
+                raise TwoQubitGateNotImplementedError("Two qubit gates are not yet implemented.")
+
+            symbol = gate.symbol.lower()
+            if symbol not in GATE_LIBRARY:
+                supported_gates = list(GATE_LIBRARY.keys())
+                raise UnsupportedGateError(symbol, supported_gates)
+
+            if symbol == "measure":
+                has_measure_gate = True
+
+        if not has_measure_gate:
+            raise CircuitMissingMeasurementError()
+
     def _get_unique_qubits(self) -> set[int]:
         """Extract all unique qubit indices from gates."""
         qubits = set()
@@ -106,17 +123,13 @@ class QICKProgramGenerator:
         """
         measured_qubits = []
         for gate in self.gates:
-            if self._get_gate_symbol(gate) == 'measure':
+            if gate.symbol.lower() == 'measure':
                 measured_qubits.extend(gate.target_qubits)
         return measured_qubits
 
-    def _get_gate_symbol(self, gate: Gate) -> str:
-        """Get the lowercase gate symbol for lookup."""
-        return gate.symbol.lower()
-
     def _generate_pulse_name(self, gate: Gate, qubit: int) -> str:
         """Generate a unique pulse name."""
-        symbol = self._get_gate_symbol(gate)
+        symbol = gate.symbol.lower()
         base_name = f"{symbol}_q{qubit}"
         if gate.params:
             param_str = "_".join([f"{p:.3f}".replace(".", "p") for p in gate.params])
@@ -137,9 +150,11 @@ class QICKProgramGenerator:
             lines.append(f"        q{q}_gen_ch = cfg.get('q{q}_gen_ch', cfg['q_gen_ch'])")
 
         lines.append("")
-        lines.append("        # Declare generators")
+        lines.append("        # Declare generators qubit")
         for q in sorted(self.unique_qubits):
             lines.append(f"        self.declare_gen(ch=q{q}_gen_ch, nqz=cfg['q_nqz'])")
+        lines.append("")
+        lines.append("        # Declare generators readout")
         lines.append("        self.declare_gen(ch=ro_gen_ch, nqz=cfg['ro_nqz'])")
 
         lines.append("")
@@ -152,41 +167,29 @@ class QICKProgramGenerator:
         # Track which envelopes we've added
         added_envelopes = set()
 
+        envelopes = []
+        pulses = []
         for gate in self.gates:
-            symbol = self._get_gate_symbol(gate)
-            if symbol not in GATE_LIBRARY:
-                continue
-
+            symbol = gate.symbol.lower()
             gate_cfg = GATE_LIBRARY[symbol]
 
             # Add Gaussian envelopes for qubit gates
             if gate_cfg.pulse_type == 'gauss' and 'gauss' not in added_envelopes:
-                lines.append("        self.add_gauss(ch=q0_gen_ch, name='gauss', sigma=cfg['q_ge_sig'], "
+                envelopes.append("        self.add_gauss(ch=q0_gen_ch, name='gauss', sigma=cfg['q_ge_sig'], "
                            "length=4 * cfg['q_ge_sig'], even_length=True)")
                 added_envelopes.add('gauss')
-
-        lines.append("")
-        lines.append("        # Add pulses")
-
-        for gate in self.gates:
-            symbol = self._get_gate_symbol(gate)
-            if symbol not in GATE_LIBRARY:
-                lines.append(f"        # Warning: Unknown gate '{symbol}'")
-                continue
-
-            gate_cfg = GATE_LIBRARY[symbol]
 
             for target in gate.target_qubits:
                 pulse_name = self._generate_pulse_name(gate, target)
 
                 if symbol == 'measure':
                     # Measurement pulse
-                    lines.append(f"        self.add_pulse(ch=ro_gen_ch, name='{pulse_name}',")
-                    lines.append("                       style='const',")
-                    lines.append("                       freq=cfg['ro_freq'],")
-                    lines.append("                       length=cfg['ro_len'],")
-                    lines.append(f"                       phase={gate_cfg.phase},")
-                    lines.append("                       gain=cfg['ro_gain'])")
+                    pulses.append(f"        self.add_pulse(ch=ro_gen_ch, name='{pulse_name}',")
+                    pulses.append("                       style='const',")
+                    pulses.append("                       freq=cfg['ro_freq'],")
+                    pulses.append("                       length=cfg['ro_len'],")
+                    pulses.append(f"                       phase={gate_cfg.phase},")
+                    pulses.append("                       gain=cfg['ro_gain'])")
                 else:
                     # Qubit gate pulse
                     gain_expr = "cfg['q_ge_gain']"
@@ -198,14 +201,19 @@ class QICKProgramGenerator:
                         angle = gate.params[0]
                         gain_expr = f"int(cfg['q_ge_gain'] * {angle} / np.pi)"
 
-                    lines.append(f"        self.add_pulse(ch=q{target}_gen_ch, name='{pulse_name}',")
-                    lines.append("                       style='arb',")
-                    lines.append("                       envelope='gauss',")
-                    lines.append(f"                       freq=cfg['q_ge'],")
-                    lines.append(f"                       phase={gate_cfg.phase},")
-                    lines.append(f"                       gain={gain_expr})")
+                    pulses.append(f"        self.add_pulse(ch=q{target}_gen_ch, name='{pulse_name}',")
+                    pulses.append("                       style='arb',")
+                    pulses.append("                       envelope='gauss',")
+                    pulses.append(f"                       freq=cfg['q_ge'],")
+                    pulses.append(f"                       phase={gate_cfg.phase},")
+                    pulses.append(f"                       gain={gain_expr})")
 
-        # Add readout configuration
+        lines.extend(envelopes)
+        lines.append("")
+        lines.append("        # Add pulses")
+        lines.extend(pulses)
+
+        # Add readout configuration.
         lines.append("")
         lines.append("        # Readout configuration")
         lines.append("        self.add_readoutconfig(ch=ro_ch, name='myro', freq=cfg['ro_freq'], gen_ch=ro_gen_ch)")
@@ -216,11 +224,14 @@ class QICKProgramGenerator:
         """Generate the _body method code."""
         lines = []
         lines.append("    def _body(self, cfg):")
+
+        # ------- do we need this block?
         lines.append("        ro_ch = cfg['ro_ch']")
         lines.append("        ro_gen_ch = cfg['ro_gen_ch']")
 
         for q in sorted(self.unique_qubits):
             lines.append(f"        q{q}_gen_ch = cfg.get('q{q}_gen_ch', cfg['q_gen_ch'])")
+        # ------- do we need this block?
 
         lines.append("")
         lines.append("        # Send readout configuration")
@@ -232,10 +243,7 @@ class QICKProgramGenerator:
 
         lines.append("        # Execute gate sequence")
         for gate in self.gates:
-            symbol = self._get_gate_symbol(gate)
-            if symbol not in GATE_LIBRARY:
-                lines.append(f"        # Warning: Unknown gate '{symbol}'")
-                continue
+            symbol = gate.symbol.lower()
 
             if symbol == 'measure':
                 # Measurement
@@ -247,19 +255,23 @@ class QICKProgramGenerator:
                 # Qubit gate
                 for target in gate.target_qubits:
                     pulse_name = self._generate_pulse_name(gate, target)
-
-                    # Handle controlled gates
-                    if gate.control_qubits:
-                        lines.append(f"        # Controlled {symbol} gate (control qubits: {gate.control_qubits})")
-                        lines.append(f"        # TODO: Implement two-qubit gate logic")
-
                     lines.append(f"        self.pulse(ch=q{target}_gen_ch, name='{pulse_name}', t=0)")
-                    lines.append("        self.delay_auto(t=0, gens=True, ros=True)")
+
+            # Always have a delay_auto between
+            lines.append("        self.delay_auto(t=0, gens=True, ros=True)")
 
         return "\n".join(lines)
 
     def generate_program(self, class_name: str = "CompiledProgram") -> str:
-        """Generate complete QICK program class code."""
+        """
+        Generate complete QICK program class code.
+
+        Raises:
+            UnsupportedGateError: If circuit contains unsupported gates
+        """
+        # Validate circuit before generating code
+        self.validate()
+
         lines = []
         lines.append('"""')
         lines.append(f"Compiled QICK program generated from Circuit.")
@@ -268,8 +280,8 @@ class QICKProgramGenerator:
         lines.append('"""')
         lines.append("")
         lines.append("import numpy as np")
-        lines.append("from qcui_measurement.qick.averager_program_v2 import AveragerProgramV2")
-        lines.append("from qcui_measurement.qick.decorators import QickBoardSweep, independent, ComplexQICKData")
+        lines.append("from qick.averager_program_v2 import AveragerProgramV2")
+        lines.append("from qick.decorators import QickBoardSweep, independent, ComplexQICKData")
         lines.append("")
         lines.append("")
 
@@ -317,6 +329,8 @@ if __name__ == '__main__':
     # Create test gates
     test_gates = [
         Gate(symbol="X", target_qubits=[0], control_qubits=[], params=[]),
+        Gate(symbol="X", target_qubits=[1], control_qubits=[], params=[]),
+        Gate(symbol="Y", target_qubits=[2], control_qubits=[], params=[]),
         Gate(symbol="RX", target_qubits=[0], control_qubits=[], params=[1.57]),
         Gate(symbol="measure", target_qubits=[0], control_qubits=[], params=[]),
     ]
