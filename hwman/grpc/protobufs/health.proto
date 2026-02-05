@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+package hwman;
 
 message Ping {
   // A simple ping message to check the health of the service.

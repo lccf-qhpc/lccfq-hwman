@@ -5,9 +5,10 @@ import grpc
 
 from hwman.certificate_manager import CertificateManager
 from hwman.config import HwmanSettings
-from hwman.grpc.protobufs_compiled import health_pb2_grpc, test_pb2_grpc
+from hwman.grpc.protobufs_compiled import health_pb2_grpc, test_pb2_grpc, circuits_pb2_grpc
 from hwman.services.health import HealthService
 from hwman.services.tests import TestService
+from hwman.services.circuits import CircuitService
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +41,7 @@ class Server:
 
         self.health_service: HealthService | None = None
         self.test_service: TestService | None = None
+        self.circuit_service: CircuitService | None = None
 
         self.server: grpc.Server | None = None
 
@@ -105,6 +107,13 @@ class Server:
         test_pb2_grpc.add_TestServicer_to_server(self.test_service, self.server)
         self.test_service._start()
 
+        logger.info("Initializing circuit service...")
+        self.circuit_service = CircuitService(
+            self.data_dir, fake_circuit_data=self.fake_calibration_data
+        )
+        circuits_pb2_grpc.add_CircuitsServicer_to_server(self.circuit_service, self.server)
+        self.circuit_service._start()
+
         logger.info("Services initialized successfully.")
 
     def serve(self) -> None:
@@ -156,4 +165,7 @@ class Server:
         if self.health_service:
             self.health_service.cleanup()
             self.health_service = None
+        if self.circuit_service:
+            self.circuit_service.cleanup()
+            self.circuit_service = None
         logger.info("Server resources cleaned up successfully.")

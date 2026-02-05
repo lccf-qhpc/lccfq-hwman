@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package hwman;
+
+// Gate definition matching lccfq_lang gate structure
+message Gate {
+    string symbol = 1;                    // Gate name (e.g., "H", "CNOT", "RZ")
+    repeated int32 target_qubits = 2;     // Target qubit indices
+    repeated int32 control_qubits = 3;    // Control qubit indices
+    repeated double params = 4;           // Gate parameters (e.g., rotation angles)
+}
+
+// Request to execute a circuit on the QPU
+message RunCircuitRequest {
+    string pid = 1;                       // Process/job ID for tracking
+    repeated Gate gates = 2;              // List of gates in the circuit
+    int32 shots = 3;                      // Number of measurement shots
+}
+
+// Single entry in the measurement distribution
+message DistributionEntry {
+    string bitstring = 1;                 // Measurement outcome (e.g., "00", "11")
+    int32 count = 2;                      // Number of times this outcome was observed
+}
+
+// Response from circuit execution
+message RunCircuitResponse {
+    string pid = 1;                       // Process/job ID
+    bool success = 2;                     // Whether execution succeeded
+    string message = 3;                   // Optional message (e.g., error details)
+    repeated DistributionEntry distribution = 4;  // Measurement results
+    string data_path = 5;                 // Path to full data file (optional)
+}
+
+// Service for direct circuit execution on QPU hardware
+service Circuits {
+    rpc RunCircuit(RunCircuitRequest) returns (RunCircuitResponse);
+}

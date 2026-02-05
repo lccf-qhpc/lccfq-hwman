@@ -35,62 +35,62 @@ class TestStub(object):
             channel: A grpc.Channel.
         """
         self.StandardTest = channel.unary_unary(
-                '/Test/StandardTest',
+                '/hwman.Test/StandardTest',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.ResSpecCal = channel.unary_unary(
-                '/Test/ResSpecCal',
+                '/hwman.Test/ResSpecCal',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.ResSpecResponse.FromString,
                 _registered_method=True)
         self.ResSpecVsGainCal = channel.unary_unary(
-                '/Test/ResSpecVsGainCal',
+                '/hwman.Test/ResSpecVsGainCal',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.SatSpec = channel.unary_unary(
-                '/Test/SatSpec',
+                '/hwman.Test/SatSpec',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.PowerRabi = channel.unary_unary(
-                '/Test/PowerRabi',
+                '/hwman.Test/PowerRabi',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.PiSpec = channel.unary_unary(
-                '/Test/PiSpec',
+                '/hwman.Test/PiSpec',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.ResSpecAfterPi = channel.unary_unary(
-                '/Test/ResSpecAfterPi',
+                '/hwman.Test/ResSpecAfterPi',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.T1 = channel.unary_unary(
-                '/Test/T1',
+                '/hwman.Test/T1',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.T2R = channel.unary_unary(
-                '/Test/T2R',
+                '/hwman.Test/T2R',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.T2E = channel.unary_unary(
-                '/Test/T2E',
+                '/hwman.Test/T2E',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.ROCal = channel.unary_unary(
-                '/Test/ROCal',
+                '/hwman.Test/ROCal',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
         self.TuneUpProtocol = channel.unary_unary(
-                '/Test/TuneUpProtocol',
+                '/hwman.Test/TuneUpProtocol',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
@@ -236,9 +236,9 @@ def add_TestServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'Test', rpc_method_handlers)
+            'hwman.Test', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('Test', rpc_method_handlers)
+    server.add_registered_method_handlers('hwman.Test', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -259,7 +259,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/StandardTest',
+            '/hwman.Test/StandardTest',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
@@ -286,7 +286,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/ResSpecCal',
+            '/hwman.Test/ResSpecCal',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.ResSpecResponse.FromString,
             options,
@@ -313,7 +313,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/ResSpecVsGainCal',
+            '/hwman.Test/ResSpecVsGainCal',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
@@ -340,7 +340,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/SatSpec',
+            '/hwman.Test/SatSpec',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
@@ -367,7 +367,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/PowerRabi',
+            '/hwman.Test/PowerRabi',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
@@ -394,7 +394,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/PiSpec',
+            '/hwman.Test/PiSpec',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
@@ -421,7 +421,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/ResSpecAfterPi',
+            '/hwman.Test/ResSpecAfterPi',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
@@ -448,7 +448,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/T1',
+            '/hwman.Test/T1',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
@@ -475,7 +475,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/T2R',
+            '/hwman.Test/T2R',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
@@ -502,7 +502,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/T2E',
+            '/hwman.Test/T2E',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
@@ -529,7 +529,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/ROCal',
+            '/hwman.Test/ROCal',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
@@ -556,7 +556,7 @@ class Test(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Test/TuneUpProtocol',
+            '/hwman.Test/TuneUpProtocol',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,

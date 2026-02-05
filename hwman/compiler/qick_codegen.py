@@ -1,12 +1,16 @@
 """
 QICK program code generator.
 
-This module takes parsed instructions and generates QICK program code.
+This module takes Circuit objects (containing Gate objects) and generates
+QICK program code. No lexer/parser needed - works directly with dataclasses.
 """
 
-from hwman.compiler.parser import Instruction, InstructionList
-from typing import Optional
+from typing import Optional, List
 import numpy as np
+
+# Import Circuit and Gate from the services module
+from hwman.services.circuits import Circuit
+from lccfq_backend.model.tasks import Gate
 
 
 class GateConfig:
@@ -70,27 +74,52 @@ GATE_LIBRARY = {
 
 
 class QICKProgramGenerator:
-    """Generates QICK program code from parsed instructions."""
+    """Generates QICK program code from a Circuit object."""
 
-    def __init__(self, instruction_list: InstructionList):
-        self.instructions = instruction_list.instructions
+    def __init__(self, circuit: Circuit):
+        """
+        Initialize the generator with a Circuit.
+
+        Args:
+            circuit: Circuit object containing gates, shots, and pid
+        """
+        self.circuit = circuit
+        self.gates = circuit.gates
         self.unique_qubits = self._get_unique_qubits()
         self.pulse_counter = 0
 
     def _get_unique_qubits(self) -> set[int]:
-        """Extract all unique qubit indices from instructions."""
+        """Extract all unique qubit indices from gates."""
         qubits = set()
-        for instr in self.instructions:
-            qubits.update(instr.targets)
-            if instr.controls:
-                qubits.update(instr.controls)
+        for gate in self.gates:
+            qubits.update(gate.target_qubits)
+            if gate.control_qubits:
+                qubits.update(gate.control_qubits)
         return qubits
 
-    def _generate_pulse_name(self, gate: str, qubit: int, params: Optional[list[float]] = None) -> str:
+    def _get_measured_qubits_in_order(self) -> List[int]:
+        """
+        Extract measured qubits in the order they are measured.
+
+        Returns list of qubit indices in measurement order.
+        If a qubit is measured multiple times, it appears multiple times.
+        """
+        measured_qubits = []
+        for gate in self.gates:
+            if self._get_gate_symbol(gate) == 'measure':
+                measured_qubits.extend(gate.target_qubits)
+        return measured_qubits
+
+    def _get_gate_symbol(self, gate: Gate) -> str:
+        """Get the lowercase gate symbol for lookup."""
+        return gate.symbol.lower()
+
+    def _generate_pulse_name(self, gate: Gate, qubit: int) -> str:
         """Generate a unique pulse name."""
-        base_name = f"{gate}_q{qubit}"
-        if params:
-            param_str = "_".join([f"{p:.3f}".replace(".", "p") for p in params])
+        symbol = self._get_gate_symbol(gate)
+        base_name = f"{symbol}_q{qubit}"
+        if gate.params:
+            param_str = "_".join([f"{p:.3f}".replace(".", "p") for p in gate.params])
             base_name += f"_{param_str}"
         self.pulse_counter += 1
         return f"{base_name}_{self.pulse_counter}"
@@ -123,11 +152,12 @@ class QICKProgramGenerator:
         # Track which envelopes we've added
         added_envelopes = set()
 
-        for instr in self.instructions:
-            if instr.gate not in GATE_LIBRARY:
+        for gate in self.gates:
+            symbol = self._get_gate_symbol(gate)
+            if symbol not in GATE_LIBRARY:
                 continue
 
-            gate_cfg = GATE_LIBRARY[instr.gate]
+            gate_cfg = GATE_LIBRARY[symbol]
 
             # Add Gaussian envelopes for qubit gates
             if gate_cfg.pulse_type == 'gauss' and 'gauss' not in added_envelopes:
@@ -138,17 +168,18 @@ class QICKProgramGenerator:
         lines.append("")
         lines.append("        # Add pulses")
 
-        for instr in self.instructions:
-            if instr.gate not in GATE_LIBRARY:
-                lines.append(f"        # Warning: Unknown gate '{instr.gate}'")
+        for gate in self.gates:
+            symbol = self._get_gate_symbol(gate)
+            if symbol not in GATE_LIBRARY:
+                lines.append(f"        # Warning: Unknown gate '{symbol}'")
                 continue
 
-            gate_cfg = GATE_LIBRARY[instr.gate]
+            gate_cfg = GATE_LIBRARY[symbol]
 
-            for target in instr.targets:
-                pulse_name = self._generate_pulse_name(instr.gate, target, instr.params)
+            for target in gate.target_qubits:
+                pulse_name = self._generate_pulse_name(gate, target)
 
-                if instr.gate == 'measure':
+                if symbol == 'measure':
                     # Measurement pulse
                     lines.append(f"        self.add_pulse(ch=ro_gen_ch, name='{pulse_name}',")
                     lines.append("                       style='const',")
@@ -161,10 +192,10 @@ class QICKProgramGenerator:
                     gain_expr = "cfg['q_ge_gain']"
 
                     # Handle parametric gates (like rx with angle parameter)
-                    if instr.params and len(instr.params) > 0:
+                    if gate.params and len(gate.params) > 0:
                         # Convert angle to gain (assuming params[0] is rotation angle in radians)
                         # For rx(theta), gain = (theta / pi) * pi_gain
-                        angle = instr.params[0]
+                        angle = gate.params[0]
                         gain_expr = f"int(cfg['q_ge_gain'] * {angle} / np.pi)"
 
                     lines.append(f"        self.add_pulse(ch=q{target}_gen_ch, name='{pulse_name}',")
@@ -200,25 +231,26 @@ class QICKProgramGenerator:
         self.pulse_counter = 0
 
         lines.append("        # Execute gate sequence")
-        for instr in self.instructions:
-            if instr.gate not in GATE_LIBRARY:
-                lines.append(f"        # Warning: Unknown gate '{instr.gate}'")
+        for gate in self.gates:
+            symbol = self._get_gate_symbol(gate)
+            if symbol not in GATE_LIBRARY:
+                lines.append(f"        # Warning: Unknown gate '{symbol}'")
                 continue
 
-            if instr.gate == 'measure':
+            if symbol == 'measure':
                 # Measurement
-                for target in instr.targets:
-                    pulse_name = self._generate_pulse_name(instr.gate, target, instr.params)
+                for target in gate.target_qubits:
+                    pulse_name = self._generate_pulse_name(gate, target)
                     lines.append(f"        self.pulse(ch=ro_gen_ch, name='{pulse_name}', t=0)")
                     lines.append(f"        self.trigger(ros=ro_ch, pins=[0], t=cfg['trig_time'])")
             else:
                 # Qubit gate
-                for target in instr.targets:
-                    pulse_name = self._generate_pulse_name(instr.gate, target, instr.params)
+                for target in gate.target_qubits:
+                    pulse_name = self._generate_pulse_name(gate, target)
 
                     # Handle controlled gates
-                    if instr.controls:
-                        lines.append(f"        # Controlled {instr.gate} gate (control qubits: {instr.controls})")
+                    if gate.control_qubits:
+                        lines.append(f"        # Controlled {symbol} gate (control qubits: {gate.control_qubits})")
                         lines.append(f"        # TODO: Implement two-qubit gate logic")
 
                     lines.append(f"        self.pulse(ch=q{target}_gen_ch, name='{pulse_name}', t=0)")
@@ -230,7 +262,9 @@ class QICKProgramGenerator:
         """Generate complete QICK program class code."""
         lines = []
         lines.append('"""')
-        lines.append(f"Compiled QICK program generated from instruction list.")
+        lines.append(f"Compiled QICK program generated from Circuit.")
+        lines.append(f"Circuit PID: {self.circuit.pid}")
+        lines.append(f"Shots: {self.circuit.shots}")
         lines.append('"""')
         lines.append("")
         lines.append("import numpy as np")
@@ -238,10 +272,15 @@ class QICKProgramGenerator:
         lines.append("from qcui_measurement.qick.decorators import QickBoardSweep, independent, ComplexQICKData")
         lines.append("")
         lines.append("")
+
+        # Generate decorator with measured qubits in order
+        measured_qubits = self._get_measured_qubits_in_order()
         lines.append("@QickBoardSweep(")
         lines.append("    independent('repetition'),")
-        lines.append("    ComplexQICKData('signal', depends_on=['repetition'])")
+        for qubit in measured_qubits:
+            lines.append(f"    ComplexQICKData('qubit_{qubit}', depends_on=['repetition']),")
         lines.append(")")
+
         lines.append(f"class {class_name}(AveragerProgramV2):")
         lines.append('    """Generated QICK program."""')
         lines.append("")
@@ -256,33 +295,42 @@ class QICKProgramGenerator:
         return "\n".join(lines)
 
 
-def compile_to_qick(instruction_str: str, class_name: str = "CompiledProgram") -> str:
+def compile_circuit_to_qick(circuit: Circuit, class_name: str = "CompiledProgram") -> str:
     """
-    Compile an instruction string to QICK program code.
+    Compile a Circuit object to QICK program code.
 
     Args:
-        instruction_str: Instruction string to parse
+        circuit: Circuit object containing gates, shots, and pid
         class_name: Name for the generated program class
 
     Returns:
         Python source code for the QICK program
     """
-    from hwman.compiler.parser import parse_instructions
-
-    instruction_list = parse_instructions(instruction_str)
-    generator = QICKProgramGenerator(instruction_list)
+    generator = QICKProgramGenerator(circuit)
     return generator.generate_program(class_name)
 
 
 if __name__ == '__main__':
-    # Test program generation
-    test_input = "[x @ [0] ctrl by None w/ params=None, rx @ [0] ctrl by None w/ params=[1.57], measure @ [0] ctrl by None w/ params=None]"
+    # Test program generation with Circuit object
+    from lccfq_backend.model.tasks import Gate
 
-    print("Compiling instruction string to QICK program:")
-    print(test_input)
+    # Create test gates
+    test_gates = [
+        Gate(symbol="X", target_qubits=[0], control_qubits=[], params=[]),
+        Gate(symbol="RX", target_qubits=[0], control_qubits=[], params=[1.57]),
+        Gate(symbol="measure", target_qubits=[0], control_qubits=[], params=[]),
+    ]
+
+    # Create test circuit
+    test_circuit = Circuit(gates=test_gates, shots=1000, pid="test-001")
+
+    print("Compiling Circuit to QICK program:")
+    print(f"  Gates: {len(test_circuit.gates)}")
+    print(f"  Shots: {test_circuit.shots}")
+    print(f"  PID: {test_circuit.pid}")
     print("\n" + "="*80)
     print("Generated QICK Program:")
     print("="*80 + "\n")
 
-    program_code = compile_to_qick(test_input, "TestProgram")
+    program_code = compile_circuit_to_qick(test_circuit, "TestProgram")
     print(program_code)

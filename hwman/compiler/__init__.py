@@ -1,21 +1,23 @@
 """
 Quantum instruction compiler for QICK programs.
 
-This package provides tools to compile quantum gate instructions into QICK programs:
-- lexer.py: Lexical analyzer for instruction format
-- parser.py: Parser that creates AST from instructions
-- qick_codegen.py: Code generator that produces QICK program classes
+This package compiles Circuit objects (containing Gate objects) into QICK programs.
 
 Usage:
-    from hwman.compiler import compile_to_qick
+    from hwman.compiler import compile_circuit_to_qick
+    from hwman.services.circuits import Circuit
+    from lccfq_backend.model.tasks import Gate
 
-    instructions = "[x @ [0] ctrl by None w/ params=None, measure @ [0] ctrl by None w/ params=None]"
-    program_code = compile_to_qick(instructions, class_name="MyProgram")
+    gates = [
+        Gate(symbol="X", target_qubits=[0], control_qubits=[], params=[]),
+        Gate(symbol="measure", target_qubits=[0], control_qubits=[], params=[]),
+    ]
+    circuit = Circuit(gates=gates, shots=1000, pid="my-circuit")
+    program_code = compile_circuit_to_qick(circuit, class_name="MyProgram")
 
     # program_code now contains Python source for a QICK AveragerProgramV2 class
 """
 
-from hwman.compiler.qick_codegen import compile_to_qick
-from hwman.compiler.parser import parse_instructions, Instruction, InstructionList
+from hwman.compiler.qick_codegen import compile_circuit_to_qick, QICKProgramGenerator
 
-__all__ = ['compile_to_qick', 'parse_instructions', 'Instruction', 'InstructionList']
+__all__ = ['compile_circuit_to_qick', 'QICKProgramGenerator']

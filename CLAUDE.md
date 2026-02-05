@@ -133,6 +133,7 @@ uv sync
 uv sync --group dev
 
 # Type checking (mypy configuration in pyproject.toml)
+# NOTE: Type checks and ruff linting are not required for now during active development
 uv run mypy hwman/
 
 # Linting/formatting (ruff configuration in pyproject.toml)
@@ -142,6 +143,8 @@ uv run ruff format hwman/
 # Run JupyterLab (for analysis notebooks)
 uv run jupyter lab
 ```
+
+**Note**: Type checks (mypy) and ruff linting are not required for now during active development.
 
 ## Development Guidelines
 

@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+package hwman;
 
 enum TestType {
     ADC_TRIGGER_CALIBRATION = 0;

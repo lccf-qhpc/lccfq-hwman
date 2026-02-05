@@ -24,15 +24,15 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n hwman/grpc/protobufs/users.proto\"#\n\x04User\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t*R\n\x08UserType\x12\x19\n\x15USER_TYPE_UNSPECIFIED\x10\x00\x12\x13\n\x0fUSER_TYPE_ADMIN\x10\x01\x12\x16\n\x12USER_TYPE_STANDARD\x10\x02\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n hwman/grpc/protobufs/users.proto\x12\x05hwman\"#\n\x04User\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05\x65mail\x18\x02 \x01(\t*R\n\x08UserType\x12\x19\n\x15USER_TYPE_UNSPECIFIED\x10\x00\x12\x13\n\x0fUSER_TYPE_ADMIN\x10\x01\x12\x16\n\x12USER_TYPE_STANDARD\x10\x02\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'hwman.grpc.protobufs.users_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_USERTYPE']._serialized_start=73
-  _globals['_USERTYPE']._serialized_end=155
-  _globals['_USER']._serialized_start=36
-  _globals['_USER']._serialized_end=71
+  _globals['_USERTYPE']._serialized_start=80
+  _globals['_USERTYPE']._serialized_end=162
+  _globals['_USER']._serialized_start=43
+  _globals['_USER']._serialized_end=78
 # @@protoc_insertion_point(module_scope)
