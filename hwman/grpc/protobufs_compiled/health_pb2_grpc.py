@@ -35,37 +35,37 @@ class HealthStub(object):
             channel: A grpc.Channel.
         """
         self.TestPing = channel.unary_unary(
-                '/Health/TestPing',
+                '/hwman.Health/TestPing',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.Ping.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.PingResponse.FromString,
                 _registered_method=True)
         self.StartInstrumentServer = channel.unary_unary(
-                '/Health/StartInstrumentServer',
+                '/hwman.Health/StartInstrumentServer',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.StopInstrumentServer = channel.unary_unary(
-                '/Health/StopInstrumentServer',
+                '/hwman.Health/StopInstrumentServer',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.GetInstrumentServerStatus = channel.unary_unary(
-                '/Health/GetInstrumentServerStatus',
+                '/hwman.Health/GetInstrumentServerStatus',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.StartPyroNameserver = channel.unary_unary(
-                '/Health/StartPyroNameserver',
+                '/hwman.Health/StartPyroNameserver',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.StopPyroNameserver = channel.unary_unary(
-                '/Health/StopPyroNameserver',
+                '/hwman.Health/StopPyroNameserver',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
         self.GetPyroNameserverStatus = channel.unary_unary(
-                '/Health/GetPyroNameserverStatus',
+                '/hwman.Health/GetPyroNameserverStatus',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
                 _registered_method=True)
@@ -156,9 +156,9 @@ def add_HealthServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'Health', rpc_method_handlers)
+            'hwman.Health', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('Health', rpc_method_handlers)
+    server.add_registered_method_handlers('hwman.Health', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -179,7 +179,7 @@ class Health(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Health/TestPing',
+            '/hwman.Health/TestPing',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.Ping.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.PingResponse.FromString,
             options,
@@ -206,7 +206,7 @@ class Health(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Health/StartInstrumentServer',
+            '/hwman.Health/StartInstrumentServer',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
@@ -233,7 +233,7 @@ class Health(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Health/StopInstrumentServer',
+            '/hwman.Health/StopInstrumentServer',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
@@ -260,7 +260,7 @@ class Health(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Health/GetInstrumentServerStatus',
+            '/hwman.Health/GetInstrumentServerStatus',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
@@ -287,7 +287,7 @@ class Health(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Health/StartPyroNameserver',
+            '/hwman.Health/StartPyroNameserver',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
@@ -314,7 +314,7 @@ class Health(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Health/StopPyroNameserver',
+            '/hwman.Health/StopPyroNameserver',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,
@@ -341,7 +341,7 @@ class Health(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/Health/GetPyroNameserverStatus',
+            '/hwman.Health/GetPyroNameserverStatus',
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.HealthRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_health__pb2.InstrumentServerResponse.FromString,
             options,

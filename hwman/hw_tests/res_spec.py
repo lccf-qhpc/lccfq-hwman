@@ -117,7 +117,7 @@ def analyze_res_spec(loc: Path):
 
     image_paths = [f/"res_spec_vs_freq.png" for f in savefolders]
     for f in image_paths:
-        plot_res_spec(data, fit_result, f/"res_spec_vs_freq.png")
+        plot_res_spec(data, fit_result, f)
 
     # FIXME: This should be a settable option instead of having it done every single time
 

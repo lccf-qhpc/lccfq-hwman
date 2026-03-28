@@ -199,3 +199,6 @@ analysis/
 
 # Current configuration
 config.toml
+
+.run/
+.claude/

@@ -24,21 +24,21 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!hwman/grpc/protobufs/health.proto\"\x17\n\x04Ping\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x1f\n\x0cPingResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x0f\n\rHealthRequest\"P\n\x18InstrumentServerResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0f\n\x07success\x18\x02 \x01(\x08\x12\x12\n\nis_running\x18\x03 \x01(\x08\x32\xc2\x03\n\x06Health\x12 \n\x08TestPing\x12\x05.Ping\x1a\r.PingResponse\x12\x42\n\x15StartInstrumentServer\x12\x0e.HealthRequest\x1a\x19.InstrumentServerResponse\x12\x41\n\x14StopInstrumentServer\x12\x0e.HealthRequest\x1a\x19.InstrumentServerResponse\x12\x46\n\x19GetInstrumentServerStatus\x12\x0e.HealthRequest\x1a\x19.InstrumentServerResponse\x12@\n\x13StartPyroNameserver\x12\x0e.HealthRequest\x1a\x19.InstrumentServerResponse\x12?\n\x12StopPyroNameserver\x12\x0e.HealthRequest\x1a\x19.InstrumentServerResponse\x12\x44\n\x17GetPyroNameserverStatus\x12\x0e.HealthRequest\x1a\x19.InstrumentServerResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n!hwman/grpc/protobufs/health.proto\x12\x05hwman\"\x17\n\x04Ping\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x1f\n\x0cPingResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x0f\n\rHealthRequest\"P\n\x18InstrumentServerResponse\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x0f\n\x07success\x18\x02 \x01(\x08\x12\x12\n\nis_running\x18\x03 \x01(\x08\x32\x96\x04\n\x06Health\x12,\n\x08TestPing\x12\x0b.hwman.Ping\x1a\x13.hwman.PingResponse\x12N\n\x15StartInstrumentServer\x12\x14.hwman.HealthRequest\x1a\x1f.hwman.InstrumentServerResponse\x12M\n\x14StopInstrumentServer\x12\x14.hwman.HealthRequest\x1a\x1f.hwman.InstrumentServerResponse\x12R\n\x19GetInstrumentServerStatus\x12\x14.hwman.HealthRequest\x1a\x1f.hwman.InstrumentServerResponse\x12L\n\x13StartPyroNameserver\x12\x14.hwman.HealthRequest\x1a\x1f.hwman.InstrumentServerResponse\x12K\n\x12StopPyroNameserver\x12\x14.hwman.HealthRequest\x1a\x1f.hwman.InstrumentServerResponse\x12P\n\x17GetPyroNameserverStatus\x12\x14.hwman.HealthRequest\x1a\x1f.hwman.InstrumentServerResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'hwman.grpc.protobufs.health_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_PING']._serialized_start=37
-  _globals['_PING']._serialized_end=60
-  _globals['_PINGRESPONSE']._serialized_start=62
-  _globals['_PINGRESPONSE']._serialized_end=93
-  _globals['_HEALTHREQUEST']._serialized_start=95
-  _globals['_HEALTHREQUEST']._serialized_end=110
-  _globals['_INSTRUMENTSERVERRESPONSE']._serialized_start=112
-  _globals['_INSTRUMENTSERVERRESPONSE']._serialized_end=192
-  _globals['_HEALTH']._serialized_start=195
-  _globals['_HEALTH']._serialized_end=645
+  _globals['_PING']._serialized_start=44
+  _globals['_PING']._serialized_end=67
+  _globals['_PINGRESPONSE']._serialized_start=69
+  _globals['_PINGRESPONSE']._serialized_end=100
+  _globals['_HEALTHREQUEST']._serialized_start=102
+  _globals['_HEALTHREQUEST']._serialized_end=117
+  _globals['_INSTRUMENTSERVERRESPONSE']._serialized_start=119
+  _globals['_INSTRUMENTSERVERRESPONSE']._serialized_end=199
+  _globals['_HEALTH']._serialized_start=202
+  _globals['_HEALTH']._serialized_end=736
 # @@protoc_insertion_point(module_scope)

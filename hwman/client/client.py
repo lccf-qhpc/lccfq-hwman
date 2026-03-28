@@ -7,7 +7,8 @@ from hwman.grpc.protobufs_compiled.health_pb2_grpc import HealthStub  # type: ig
 from hwman.grpc.protobufs_compiled.health_pb2 import Ping, HealthRequest  # type: ignore
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestStub  # type: ignore
 from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestType  # type: ignore
-from hwman.certificate_manager import CertificateManager
+from hwman.grpc.protobufs_compiled.circuits_pb2_grpc import CircuitsStub  # type: ignore
+from hwman.grpc.protobufs_compiled.circuits_pb2 import RunCircuitRequest, RunCircuitResponse, Gate  # type: ignore
 
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,7 @@ class Client:
 
         self.health_stub: HealthStub | None = None
         self.test_stub: TestStub | None = None
+        self.circuits_stub: CircuitsStub | None = None
 
         self._initialize_certificates()
 
@@ -48,38 +50,57 @@ class Client:
             self.initialize()
 
     def _initialize_certificates(self) -> None:
+        """
+        Load client certificates for mTLS authentication.
+
+        Required files:
+        - CA certificate (ca.crt): The CA's public certificate to verify the server
+        - Client certificate ({name}.crt): This client's certificate, signed by the CA
+        - Client key ({name}.key): This client's private key
+
+        Note: Client certificates must be pre-generated on the hwman server and
+        distributed to clients. The CA private key should never leave the server.
+        Use `CertificateManager.create_client_certificate(name)` on the server
+        to generate client certificates.
+        """
+        # Check all required files exist before loading any
+        missing_files = []
+
         if not self.ca_cert_path.exists():
-            logger.error(f"CA certificate file not found: {self.ca_cert_path}")
-            raise FileNotFoundError(
-                f"CA certificate file not found: {self.ca_cert_path}"
+            missing_files.append(f"CA certificate: {self.ca_cert_path}")
+
+        if not self.client_cert_path.exists():
+            missing_files.append(f"Client certificate: {self.client_cert_path}")
+
+        if not self.client_key_path.exists():
+            missing_files.append(f"Client key: {self.client_key_path}")
+
+        if missing_files:
+            error_msg = (
+                "Missing required certificate files for mTLS authentication:\n"
+                + "\n".join(f"  - {f}" for f in missing_files)
+                + "\n\nClient certificates must be generated on the hwman server "
+                "and copied to the client. On the server, run:\n"
+                f"  CertificateManager(cert_dir).create_client_certificate('{self.name}')\n"
+                "Then copy ca.crt and the client cert/key files to the client machine."
             )
+            logger.error(error_msg)
+            raise FileNotFoundError(error_msg)
 
-        if not self.client_cert_path.exists() or not self.client_key_path.exists():
-            logger.info(
-                f"Certificates files not found for client creating them: {self.client_cert_path}, {self.client_key_path}"
-            )
+        # Load the certificates
+        with open(self.ca_cert_path, "rb") as f:
+            self.ca_cert = f.read()
+        logger.debug(f"Loaded CA certificate from {self.ca_cert_path}")
 
-            self.certificate_manager = CertificateManager(self.ca_cert_path.parent)
-            self.certificate_manager.create_client_certificate(self.name)
+        with open(self.client_cert_path, "rb") as f:
+            self.client_cert = f.read()
+        logger.debug(f"Loaded client certificate from {self.client_cert_path}")
 
-        try:
-            with open(self.ca_cert_path, "rb") as f:
-                self.ca_cert = f.read()
-        except FileNotFoundError as e:
-            logger.error(f"CA certificate file not found: {self.ca_cert_path}")
-            raise e
-        try:
-            with open(self.client_cert_path, "rb") as f:
-                self.client_cert = f.read()
-        except FileNotFoundError as e:
-            logger.error(f"Client certificate file not found: {self.client_cert_path}")
-            raise e
-        try:
-            with open(self.client_key_path, "rb") as f:
-                self.client_key = f.read()
-        except FileNotFoundError as e:
-            logger.error(f"Client key file not found: {self.client_key_path}")
-            raise e
+        with open(self.client_key_path, "rb") as f:
+            self.client_key = f.read()
+        logger.debug(f"Loaded client key from {self.client_key_path}")
+
+        logger.info(f"Successfully loaded certificates for client '{self.name}'")
 
     def initialize(self) -> None:
         logger.info(
@@ -101,6 +122,7 @@ class Client:
 
         self.health_stub = HealthStub(self.channel)
         self.test_stub = TestStub(self.channel)
+        self.circuits_stub = CircuitsStub(self.channel)
 
     def ping_server(self) -> str | None:
         try:
@@ -331,3 +353,70 @@ class Client:
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
+
+    def run_circuit(
+        self,
+        gates: list[dict],
+        shots: int,
+        pid: str = "",
+    ) -> dict[str, int] | None:
+        """
+        Execute a quantum circuit on the QPU.
+
+        Args:
+            gates: List of gate dictionaries with keys:
+                - symbol: Gate name (e.g., "H", "CNOT", "RZ")
+                - target_qubits: List of target qubit indices
+                - control_qubits: List of control qubit indices (optional)
+                - params: List of gate parameters (optional)
+            shots: Number of measurement shots
+            pid: Optional process/job ID for tracking
+
+        Returns:
+            Dictionary mapping bitstring outcomes to counts, or None on error
+
+        Example:
+            >>> gates = [
+            ...     {"symbol": "H", "target_qubits": [0], "control_qubits": [], "params": []},
+            ...     {"symbol": "CNOT", "target_qubits": [1], "control_qubits": [0], "params": []},
+            ... ]
+            >>> result = client.run_circuit(gates, shots=1000)
+            >>> print(result)  # {"00": 512, "11": 488}
+        """
+        try:
+            assert self.circuits_stub is not None, "Circuits stub is not initialized"
+
+            # Convert gate dicts to proto Gate messages
+            proto_gates = [
+                Gate(
+                    symbol=g["symbol"],
+                    target_qubits=g.get("target_qubits", []),
+                    control_qubits=g.get("control_qubits", []),
+                    params=g.get("params", []),
+                )
+                for g in gates
+            ]
+
+            request = RunCircuitRequest(
+                pid=pid,
+                gates=proto_gates,
+                shots=shots,
+            )
+
+            response: RunCircuitResponse = self.circuits_stub.RunCircuit(request)
+
+            if not response.success:
+                logger.error(f"Circuit execution failed: {response.message}")
+                return None
+
+            # Convert distribution entries to dict
+            distribution = {
+                entry.bitstring: entry.count
+                for entry in response.distribution
+            }
+
+            return distribution
+
+        except grpc.RpcError as e:
+            logger.error(f"Failed to run circuit: {e}")
+            return None

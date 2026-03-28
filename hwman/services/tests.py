@@ -37,7 +37,7 @@ from qcui_measurement.qick.single_transmon_v2 import (
 from qcui_analysis.fitfuncs.resonators import HangerResponseBruno  # noqa: F401  # Required for side effects
 
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestServicer  # type: ignore
-from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType, FitParameter  # type: ignore
+from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType, FitParameter, ResSpecResponse  # type: ignore
 
 
 from hwman.services import Service
@@ -150,18 +150,17 @@ class TestService(Service, TestServicer):
             )
         return fit_params
 
-    def ResSpecCal(self, request: TestRequest, context: grpc.ServicerContext) -> TestResponse:
+    def ResSpecCal(self, request: TestRequest, context: grpc.ServicerContext) -> ResSpecResponse:
         job_id = request.pid
         if job_id is None or job_id == "":
             job_id = generate_id()
         logger.info("ResSpecCal called")
 
         try:
-            loc, fit_result, snr = res_spec(job_id, fake_calibration_data=self.fake_calibration_data)
+            test_ret = res_spec(job_id, fake_calibration_data=self.fake_calibration_data)
             logger.info("ResSpecCal finished")
-            fit_params = self._assemble_fit_params(fit_result)
-
-            return TestResponse(pid=job_id, status=True, data_path=str(loc), snr=snr, fit_parameters=fit_params)
+            fit_params = self._assemble_fit_params(test_ret.fit_result)
+            return ResSpecResponse(pid=job_id, status=True, f=fit_params["f_0"].value, error=fit_params["f_0"].error, snr=test_ret.snr)
         except Exception as e:
             logger.error(e)
             return TestResponse(status=False, data_path=str(self.data_dir), pid=job_id)
