@@ -53,10 +53,9 @@ exclude = ["certs*"]
 [tool.uv.sources]
 labcore = { path = "../labcore", editable = true }
 instrumentserver = { path = "../instrumentserver", editable = true }
-qcui_measurement = { path = "../measurement", editable = true }
-qcui_analysis = {path = "../analysis", editable = true}
 qick = { path = "../qick", editable = true }
 lccfq-backend = { path = "../lccfq-backend", editable = true }
+cqedtoolbox = { path = "../CQEDToolbox", editable = true }
 
 [dependency-groups]
 dev = [
@@ -66,10 +65,9 @@ dev = [
 ]
 hw-resources = [
     "qick",
-    "qcui_measurement",
-    "qcui_analysis",
     "instrumentserver",
     "labcore",
+    "cqedtoolbox",
 ]
 labcore = [
     "hvplot>=0.12.0",

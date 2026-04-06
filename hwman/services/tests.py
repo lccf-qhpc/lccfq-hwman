@@ -12,37 +12,16 @@ import sys
 
 import grpc
 
-from hwman.hw_tests.pi_spec import pi_spec
-from hwman.hw_tests.power_rabi import power_rabi
-from hwman.hw_tests.res_spec_after_pi import res_spec_after_pi
-from hwman.hw_tests.res_spec_vs_gain import res_spec_vs_gain
-from hwman.hw_tests.ro_cal import ro_cal
-from hwman.hw_tests.sat_spec import sat_spec
-from hwman.hw_tests.t1 import t1
-from hwman.hw_tests.t2x import t2x
-from labcore.measurement.storage import run_and_save_sweep
-
-from qcui_measurement.qick.single_transmon_v2 import (
-    FreqSweepProgram,
-    PulseProbeSpectroscopy,
-    AmplitudeRabiProgram,
-    PiSpecProgram,
-    ResProbeProgram,
-    T1Program,
-    T2RProgram,
-    T2nProgram,
-)
-
 # This needs to be imported before any other subprocesses start.
-from qcui_analysis.fitfuncs.resonators import HangerResponseBruno  # noqa: F401  # Required for side effects
+# from qcui_analysis.fitfuncs.resonators import HangerResponseBruno  # noqa: F401  # Required for side effects
 
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestServicer  # type: ignore
 from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType, FitParameter, ResSpecResponse  # type: ignore
 
 
 from hwman.services import Service
-from hwman.hw_tests.res_spec import res_spec
-from hwman.hw_tests.utils import setup_measurement_env, generate_id, set_bandpass_filters
+
+from hwman.utils.hw_tests import setup_measurement_env, generate_id, set_bandpass_filters
 
 logger = logging.getLogger(__name__)
 
@@ -90,25 +69,25 @@ class TestService(Service, TestServicer):
 
     def _perform_measurement(self, measurement_type: TestType, pid: str) -> None:
 
-        match measurement_type:
-            case TestType.RESONATOR_SPEC:
-                program = FreqSweepProgram()
-            case TestType.PULSE_PROBE_SPECTROSCOPY:
-                program = PulseProbeSpectroscopy()
-            case TestType.POWER_RABI:
-                program = AmplitudeRabiProgram()
-            case TestType.PI_SPEC:
-                program = PiSpecProgram()
-            case TestType.RESONATOR_SPEC_AFTER_PI:
-                program = ResProbeProgram()
-            case TestType.T1:
-                program = T1Program()
-            case TestType.T2R:
-                program = T2RProgram()
-            case TestType.T2E:
-                program = T2nProgram()
-
-        run_and_save_sweep(program, str(self.data_dir), pid)
+        # match measurement_type:
+        #     case TestType.RESONATOR_SPEC:
+        #         program = FreqSweepProgram()
+        #     case TestType.PULSE_PROBE_SPECTROSCOPY:
+        #         program = PulseProbeSpectroscopy()
+        #     case TestType.POWER_RABI:
+        #         program = AmplitudeRabiProgram()
+        #     case TestType.PI_SPEC:
+        #         program = PiSpecProgram()
+        #     case TestType.RESONATOR_SPEC_AFTER_PI:
+        #         program = ResProbeProgram()
+        #     case TestType.T1:
+        #         program = T1Program()
+        #     case TestType.T2R:
+        #         program = T2RProgram()
+        #     case TestType.T2E:
+        #         program = T2nProgram()
+        #
+        # run_and_save_sweep(program, str(self.data_dir), pid)
 
         return
 

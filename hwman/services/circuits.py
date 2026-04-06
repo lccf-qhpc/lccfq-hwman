@@ -17,7 +17,7 @@ from hwman.grpc.protobufs_compiled.circuits_pb2 import (  # type: ignore
     Gate as ProtoGate,
 )
 from hwman.services import Service
-from hwman.hw_tests.utils import generate_id
+from hwman.utils.hw_tests import generate_id
 
 # Import Gate model from lccfq-backend for internal representation
 from lccfq_backend.model.tasks import Gate

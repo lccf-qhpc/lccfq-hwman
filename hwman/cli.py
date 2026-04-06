@@ -102,6 +102,10 @@ def setup_logging(log_level: str = "INFO") -> None:
         force=True  # Override any existing configuration
     )
 
+    # Suppress debug noise insturmentserver. This updates multiple debug logging messages for each param requested
+    logging.getLogger('instrumentserver').setLevel(logging.INFO)
+    logging.getLogger('qcodes').setLevel(logging.INFO)
+
 
 @app.command()
 def start(
