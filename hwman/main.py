@@ -103,7 +103,7 @@ class Server:
             self.health_service._start_qick_server()
 
         logger.info("Initializing test service...")
-        self.test_service = TestService(self.data_dir, fake_calibration_data=self.fake_calibration_data)
+        self.test_service = TestService(self.data_dir, params_file=self.instrumentserver_params_file, fake_calibration_data=self.fake_calibration_data)
         test_pb2_grpc.add_TestServicer_to_server(self.test_service, self.server)
         self.test_service._start()
 

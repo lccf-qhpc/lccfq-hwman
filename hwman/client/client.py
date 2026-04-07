@@ -240,115 +240,115 @@ class Client:
             logger.error(f"Failed to start test: {e}")
             return None
 
-    def start_res_spec(self) -> str | None:
+    def start_res_spec(self, save_to_file: bool = True) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.ResSpecCal(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
             return None
 
-    def start_res_spec_vs_gain(self) -> str | None:
+    def start_res_spec_vs_gain(self, save_to_file: bool = True) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.ResSpecVsGainCal(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
             return None
 
-    def start_sat_spec(self) -> str | None:
+    def start_sat_spec(self, save_to_file: bool = True) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.SatSpec(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
             return None
 
-    def start_power_rabi(self) -> str | None:
+    def start_power_rabi(self, save_to_file: bool = True) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.PowerRabi(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
             return None
 
-    def start_pi_spec(self) -> str | None:
+    def start_pi_spec(self, save_to_file: bool = True) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.PiSpec(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
 
-    def start_res_spec_after_pi(self) -> str | None:
+    def start_res_spec_after_pi(self, save_to_file: bool = True) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.ResSpecAfterPi(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
 
-    def start_t1(self) -> str | None:
+    def start_t1(self, save_to_file: bool = True) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.T1(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
 
-    def start_t2r(self) -> str | None:
+    def start_t2r(self, save_to_file: bool = True) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.T2R(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
 
-    def start_t2e(self) -> str | None:
+    def start_t2e(self, save_to_file: bool = True) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.T2E(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
 
-    def start_ro_cal(self) -> str | None:
+    def start_ro_cal(self, save_to_file: bool = True) -> str | None:
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.ROCal(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
 
-    def start_tuneup_protocol(self):
+    def start_tuneup_protocol(self, save_to_file: bool = True):
         try:
             assert self.test_stub is not None, "Test stub is not initialized"
             ret = self.test_stub.TuneUpProtocol(
-                TestRequest()
+                TestRequest(save_to_file=save_to_file)
             )
             return ret
         except grpc.RpcError as e:

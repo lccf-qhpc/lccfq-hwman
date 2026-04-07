@@ -22,10 +22,11 @@ message FitParameter {
 }
 
 message TestRequest {
-    string pid = 1;   
+    string pid = 1;
     TestType test_type = 2;
     int32 shots = 3;
     bool return_full_data = 4;
+    bool save_to_file = 5;
 }
 
 message TestResponse {

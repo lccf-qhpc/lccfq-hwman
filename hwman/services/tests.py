@@ -41,10 +41,11 @@ logger = logging.getLogger(__name__)
 class TestService(Service, TestServicer):
     NUMBER_OF_RETRIES = 10
 
-    def __init__(self, data_dir: Path, fake_calibration_data: bool = False, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, data_dir: Path, params_file: Path | None = None, fake_calibration_data: bool = False, *args: Any, **kwargs: Any) -> None:
         logger.info("Initializing TestService")
         super().__init__(*args, **kwargs)
         self.data_dir = data_dir
+        self.params_file = params_file
         self.fake_calibration_data = fake_calibration_data
         self.params = None
 
@@ -136,12 +137,18 @@ class TestService(Service, TestServicer):
             )
         return fit_params
 
+    def _save_params_if_requested(self, request: TestRequest) -> None:
+        if request.save_to_file:
+            logger.info(f"Saving parameters to {self.params_file}")
+            self.params.toFile(filePath=self.params_file)
+
     def ResSpecCal(self, request: TestRequest, context: grpc.ServicerContext) -> ResSpecResponse:
         job_id = request.pid or generate_id()
         logger.info("ResSpecCal called")
         try:
             op = self._make_operation(ResonatorSpectroscopy)
             op.execute()
+            self._save_params_if_requested(request)
             fit_params = self._assemble_fit_params(op.fit_result)
             return ResSpecResponse(
                 pid=job_id, status=True,
@@ -158,6 +165,7 @@ class TestService(Service, TestServicer):
         logger.info("ResSpecVsGainCal called")
         op = self._make_operation(ResonatorSpectroscopyVsGain)
         op.execute()
+        self._save_params_if_requested(request)
         logger.info("ResSpecVsGainCal finished")
         return TestResponse(status=True)
 
@@ -166,6 +174,7 @@ class TestService(Service, TestServicer):
         logger.info("SatSpec called")
         op = self._make_operation(SaturationSpectroscopy)
         op.execute()
+        self._save_params_if_requested(request)
         logger.info("SatSpec finished")
         return TestResponse(status=True)
 
@@ -174,6 +183,7 @@ class TestService(Service, TestServicer):
         logger.info("PowerRabi called")
         op = self._make_operation(PowerRabiOperation)
         op.execute()
+        self._save_params_if_requested(request)
         logger.info("PowerRabi finished")
         return TestResponse(status=True)
 
@@ -182,6 +192,7 @@ class TestService(Service, TestServicer):
         logger.info("PiSpec called")
         op = self._make_operation(PiSpectroscopy)
         op.execute()
+        self._save_params_if_requested(request)
         logger.info("PiSpec finished")
         return TestResponse(status=True)
 
@@ -190,6 +201,7 @@ class TestService(Service, TestServicer):
         logger.info("ResSpecAfterPi called")
         op = self._make_operation(ResonatorSpectroscopyAfterPi)
         op.execute()
+        self._save_params_if_requested(request)
         logger.info("ResSpecAfterPi finished")
         return TestResponse(status=True)
 
@@ -198,6 +210,7 @@ class TestService(Service, TestServicer):
         logger.info("T1 called")
         op = self._make_operation(T1Operation)
         op.execute()
+        self._save_params_if_requested(request)
         logger.info("T1 finished")
         return TestResponse(status=True)
 
@@ -206,6 +219,7 @@ class TestService(Service, TestServicer):
         logger.info("T2R called")
         op = self._make_operation(T2ROperation)
         op.execute()
+        self._save_params_if_requested(request)
         logger.info("T2R finished")
         return TestResponse(status=True)
 
@@ -214,6 +228,7 @@ class TestService(Service, TestServicer):
         logger.info("T2E called")
         op = self._make_operation(T2EOperation)
         op.execute()
+        self._save_params_if_requested(request)
         logger.info("T2E finished")
         return TestResponse(status=True)
 
@@ -222,6 +237,7 @@ class TestService(Service, TestServicer):
         logger.info("ROCal called")
         op = self._make_operation(ReadoutCalibration)
         op.execute()
+        self._save_params_if_requested(request)
         logger.info("ROCal finished")
         return TestResponse(status=True)
 
@@ -233,5 +249,6 @@ class TestService(Service, TestServicer):
 
         op = QubitTuneup(self.params)
         op.execute()
+        self._save_params_if_requested(request)
         logger.info("TuneUpProtocol finished")
         return TestResponse(status=True, pid=job_id)
