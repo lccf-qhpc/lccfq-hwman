@@ -30,6 +30,7 @@ from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestServicer  # type: ig
 from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType, FitParameter, ResSpecResponse  # type: ignore
 
 from hwman.services import Service
+from hwman.services.readout_calibrator import ReadoutCalibrator
 
 from hwman.utils.hw_tests import setup_measurement_env, generate_id, set_bandpass_filters
 
@@ -41,16 +42,18 @@ logger = logging.getLogger(__name__)
 class TestService(Service, TestServicer):
     NUMBER_OF_RETRIES = 10
 
-    def __init__(self, data_dir: Path, params_file: Path | None = None, fake_calibration_data: bool = False, *args: Any, **kwargs: Any) -> None:
+    def __init__(self, data_dir: Path, params_file: Path | None = None, fake_calibration_data: bool = False, calibrator: ReadoutCalibrator | None = None, *args: Any, **kwargs: Any) -> None:
         logger.info("Initializing TestService")
         super().__init__(*args, **kwargs)
         self.data_dir = data_dir
         self.params_file = params_file
         self.fake_calibration_data = fake_calibration_data
+        self.calibrator = calibrator
         self.params = None
 
     def _start(self) -> None:
         if self.fake_calibration_data:
+            self.conf = None
             self.params = None
             logger.info("Fake calibration mode: skipping hardware setup")
             return
@@ -238,6 +241,9 @@ class TestService(Service, TestServicer):
         op = self._make_operation(ReadoutCalibration)
         op.execute()
         self._save_params_if_requested(request)
+        if self.calibrator is not None:
+            self.calibrator.fit(op.I_ground, op.Q_ground, op.I_excited, op.Q_excited)
+            logger.info("ReadoutCalibrator fitted")
         logger.info("ROCal finished")
         return TestResponse(status=True)
 

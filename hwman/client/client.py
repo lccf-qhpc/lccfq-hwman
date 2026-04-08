@@ -359,7 +359,7 @@ class Client:
         gates: list[dict],
         shots: int,
         pid: str = "",
-    ) -> dict[str, int] | None:
+    ) -> dict | None:
         """
         Execute a quantum circuit on the QPU.
 
@@ -409,13 +409,13 @@ class Client:
                 logger.error(f"Circuit execution failed: {response.message}")
                 return None
 
-            # Convert distribution entries to dict
-            distribution = {
-                entry.bitstring: entry.count
-                for entry in response.distribution
+            return {
+                "distribution": {
+                    entry.bitstring: entry.count
+                    for entry in response.distribution
+                },
+                "raw_bitstream": list(response.raw_bitstream),
             }
-
-            return distribution
 
         except grpc.RpcError as e:
             logger.error(f"Failed to run circuit: {e}")

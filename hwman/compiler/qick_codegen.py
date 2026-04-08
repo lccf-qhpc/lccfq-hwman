@@ -9,8 +9,7 @@ from dataclasses import dataclass
 from typing import Optional, List
 import numpy as np
 
-# Import Circuit and Gate from the services module
-from hwman.services.circuits import Circuit
+from hwman.compiler.circuit import Circuit
 from lccfq_backend.model.tasks import Gate
 from hwman.errors import UnsupportedGateError, CircuitMissingMeasurementError, TwoQubitGateNotImplementedError
 
@@ -142,12 +141,12 @@ class QICKProgramGenerator:
         lines = []
         lines.append("    def _initialize(self, cfg):")
         lines.append("        # Extract configuration")
-        lines.append("        ro_ch = cfg['ro_ch']")
-        lines.append("        ro_gen_ch = cfg['ro_gen_ch']")
+        lines.append("        ro_ch = cfg['ro_adc_ch']")
+        lines.append("        ro_gen_ch = cfg['ro_dac_ch']")
 
         # Declare qubit generator channels
         for q in sorted(self.unique_qubits):
-            lines.append(f"        q{q}_gen_ch = cfg.get('q{q}_gen_ch', cfg['q_gen_ch'])")
+            lines.append(f"        q{q}_gen_ch = cfg.get('q{q}_dac_ch', cfg['q_dac_ch'])")
 
         lines.append("")
         lines.append("        # Declare generators qubit")
@@ -162,6 +161,9 @@ class QICKProgramGenerator:
         lines.append("        self.declare_readout(ch=ro_ch, length=cfg['ro_len'])")
 
         lines.append("")
+        lines.append("        # Shot loop (reps must be 1 in cfg for single-shot data)")
+        lines.append(f"        self.add_loop('shots_loop', {self.circuit.shots})")
+        lines.append("")
         lines.append("        # Add pulse envelopes")
 
         # Track which envelopes we've added
@@ -175,8 +177,8 @@ class QICKProgramGenerator:
 
             # Add Gaussian envelopes for qubit gates
             if gate_cfg.pulse_type == 'gauss' and 'gauss' not in added_envelopes:
-                envelopes.append("        self.add_gauss(ch=q0_gen_ch, name='gauss', sigma=cfg['q_ge_sig'], "
-                           "length=4 * cfg['q_ge_sig'], even_length=True)")
+                envelopes.append("        self.add_gauss(ch=q0_gen_ch, name='gauss', sigma=cfg['q_pi_sigma'], "
+                           "length=cfg['q_pi_n_sigma'] * cfg['q_pi_sigma'], even_length=True)")
                 added_envelopes.add('gauss')
 
             for target in gate.target_qubits:
@@ -184,7 +186,7 @@ class QICKProgramGenerator:
 
                 if symbol == 'measure':
                     # Measurement pulse
-                    pulses.append(f"        self.add_pulse(ch=ro_gen_ch, name='{pulse_name}',")
+                    pulses.append(f"        self.add_pulse(ch=ro_gen_ch, name='{pulse_name}', ro_ch=ro_ch,")
                     pulses.append("                       style='const',")
                     pulses.append("                       freq=cfg['ro_freq'],")
                     pulses.append("                       length=cfg['ro_len'],")
@@ -192,19 +194,19 @@ class QICKProgramGenerator:
                     pulses.append("                       gain=cfg['ro_gain'])")
                 else:
                     # Qubit gate pulse
-                    gain_expr = "cfg['q_ge_gain']"
+                    gain_expr = "cfg['q_pi_gain']"
 
                     # Handle parametric gates (like rx with angle parameter)
                     if gate.params and len(gate.params) > 0:
                         # Convert angle to gain (assuming params[0] is rotation angle in radians)
                         # For rx(theta), gain = (theta / pi) * pi_gain
                         angle = gate.params[0]
-                        gain_expr = f"int(cfg['q_ge_gain'] * {angle} / np.pi)"
+                        gain_expr = f"cfg['q_pi_gain'] * {angle} / np.pi"
 
                     pulses.append(f"        self.add_pulse(ch=q{target}_gen_ch, name='{pulse_name}',")
                     pulses.append("                       style='arb',")
                     pulses.append("                       envelope='gauss',")
-                    pulses.append(f"                       freq=cfg['q_ge'],")
+                    pulses.append(f"                       freq=cfg['q_freq'],")
                     pulses.append(f"                       phase={gate_cfg.phase},")
                     pulses.append(f"                       gain={gain_expr})")
 
@@ -226,11 +228,11 @@ class QICKProgramGenerator:
         lines.append("    def _body(self, cfg):")
 
         # ------- do we need this block?
-        lines.append("        ro_ch = cfg['ro_ch']")
-        lines.append("        ro_gen_ch = cfg['ro_gen_ch']")
+        lines.append("        ro_ch = cfg['ro_adc_ch']")
+        lines.append("        ro_gen_ch = cfg['ro_dac_ch']")
 
         for q in sorted(self.unique_qubits):
-            lines.append(f"        q{q}_gen_ch = cfg.get('q{q}_gen_ch', cfg['q_gen_ch'])")
+            lines.append(f"        q{q}_gen_ch = cfg.get('q{q}_dac_ch', cfg['q_dac_ch'])")
         # ------- do we need this block?
 
         lines.append("")
@@ -250,7 +252,7 @@ class QICKProgramGenerator:
                 for target in gate.target_qubits:
                     pulse_name = self._generate_pulse_name(gate, target)
                     lines.append(f"        self.pulse(ch=ro_gen_ch, name='{pulse_name}', t=0)")
-                    lines.append(f"        self.trigger(ros=ro_ch, pins=[0], t=cfg['trig_time'])")
+                    lines.append(f"        self.trigger(ros=[ro_ch], pins=[0], t=cfg['trig_time'])")
             else:
                 # Qubit gate
                 for target in gate.target_qubits:
@@ -280,8 +282,9 @@ class QICKProgramGenerator:
         lines.append('"""')
         lines.append("")
         lines.append("import numpy as np")
-        lines.append("from qick.averager_program_v2 import AveragerProgramV2")
-        lines.append("from qick.decorators import QickBoardSweep, independent, ComplexQICKData")
+        lines.append("from qick.asm_v2 import AveragerProgramV2")
+        lines.append("from cqedtoolbox.instruments.qick.qick_sweep_v2 import QickBoardSweep, ComplexQICKData")
+        lines.append("from labcore.measurement import independent")
         lines.append("")
         lines.append("")
 

@@ -7,6 +7,7 @@ from hwman.certificate_manager import CertificateManager
 from hwman.config import HwmanSettings
 from hwman.grpc.protobufs_compiled import health_pb2_grpc, test_pb2_grpc, circuits_pb2_grpc
 from hwman.services.health import HealthService
+from hwman.services.readout_calibrator import ReadoutCalibrator
 from hwman.services.tests import TestService
 from hwman.services.circuits import CircuitService
 
@@ -102,14 +103,19 @@ class Server:
             self.health_service._start_pyro_nameserver()
             self.health_service._start_qick_server()
 
+        calibrator = ReadoutCalibrator()
+
         logger.info("Initializing test service...")
-        self.test_service = TestService(self.data_dir, params_file=self.instrumentserver_params_file, fake_calibration_data=self.fake_calibration_data)
+        self.test_service = TestService(self.data_dir, params_file=self.instrumentserver_params_file, fake_calibration_data=self.fake_calibration_data, calibrator=calibrator)
         test_pb2_grpc.add_TestServicer_to_server(self.test_service, self.server)
         self.test_service._start()
 
         logger.info("Initializing circuit service...")
         self.circuit_service = CircuitService(
-            self.data_dir, fake_circuit_data=self.fake_calibration_data
+            self.data_dir,
+            fake_circuit_data=self.fake_calibration_data,
+            calibrator=calibrator,
+            conf=self.test_service.conf,
         )
         circuits_pb2_grpc.add_CircuitsServicer_to_server(self.circuit_service, self.server)
         self.circuit_service._start()

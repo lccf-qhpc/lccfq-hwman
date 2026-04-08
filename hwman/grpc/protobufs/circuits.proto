@@ -30,6 +30,7 @@ message RunCircuitResponse {
     string message = 3;                   // Optional message (e.g., error details)
     repeated DistributionEntry distribution = 4;  // Measurement results
     string data_path = 5;                 // Path to full data file (optional)
+    repeated string raw_bitstream = 6;    // Raw per-shot bitstrings in order
 }
 
 // Service for direct circuit execution on QPU hardware
