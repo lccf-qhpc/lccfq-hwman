@@ -6,7 +6,7 @@ import grpc
 from hwman.grpc.protobufs_compiled.health_pb2_grpc import HealthStub  # type: ignore
 from hwman.grpc.protobufs_compiled.health_pb2 import Ping, HealthRequest  # type: ignore
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestStub  # type: ignore
-from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestType  # type: ignore
+from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestType, GetObservablesRequest  # type: ignore
 from hwman.grpc.protobufs_compiled.circuits_pb2_grpc import CircuitsStub  # type: ignore
 from hwman.grpc.protobufs_compiled.circuits_pb2 import RunCircuitRequest, RunCircuitResponse, Gate  # type: ignore
 
@@ -353,6 +353,14 @@ class Client:
             return ret
         except grpc.RpcError as e:
             logger.error(f"Failed to start test: {e}")
+
+    def get_observables(self):
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            return self.test_stub.GetObservables(GetObservablesRequest())
+        except grpc.RpcError as e:
+            logger.error(f"Failed to get observables: {e}")
+            return None
 
     def run_circuit(
         self,

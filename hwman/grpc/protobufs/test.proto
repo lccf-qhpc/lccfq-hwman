@@ -45,6 +45,29 @@ message ResSpecResponse {
     double snr = 5;
 }
 
+message QubitObservableProto {
+    string qubit_id = 1;
+    double t1 = 2;
+    double t2 = 3;
+    double anharmonicity = 4;
+    double frequency = 5;
+    double gate_fidelity_1q = 6;
+    double gate_fidelity_2q = 7;
+    double rx_duration = 8;
+    double ry_duration = 9;
+    double sqrt_iswap_duration = 10;
+    double reset_duration = 11;
+    double measurement_duration = 12;
+    int32 max_circuit_depth = 13;
+}
+
+message GetObservablesRequest {}
+
+message GetObservablesResponse {
+    bool status = 1;
+    repeated QubitObservableProto qubits = 2;
+}
+
 service Test {
     rpc StandardTest(TestRequest) returns (TestResponse);
     rpc ResSpecCal(TestRequest) returns (ResSpecResponse);
@@ -58,4 +81,5 @@ service Test {
     rpc T2E(TestRequest) returns (TestResponse);
     rpc ROCal(TestRequest) returns (TestResponse);
     rpc TuneUpProtocol(TestRequest) returns (TestResponse);
+    rpc GetObservables(GetObservablesRequest) returns (GetObservablesResponse);
 }

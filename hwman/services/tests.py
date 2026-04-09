@@ -27,7 +27,7 @@ from cqedtoolbox.protocols.operations import (
 )
 
 from hwman.grpc.protobufs_compiled.test_pb2_grpc import TestServicer  # type: ignore
-from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType, FitParameter, ResSpecResponse  # type: ignore
+from hwman.grpc.protobufs_compiled.test_pb2 import TestRequest, TestResponse, TestType, FitParameter, ResSpecResponse, GetObservablesRequest, GetObservablesResponse, QubitObservableProto  # type: ignore
 
 from hwman.services import Service
 from hwman.services.readout_calibrator import ReadoutCalibrator
@@ -258,3 +258,39 @@ class TestService(Service, TestServicer):
         self._save_params_if_requested(request)
         logger.info("TuneUpProtocol finished")
         return TestResponse(status=True, pid=job_id)
+
+    def _collect_observables(self) -> list[QubitObservableProto]:
+        result = []
+        for qid in sorted(self.params.submodules.keys()):
+            if not qid.startswith('q') or qid == 'qick':
+                continue
+            qubit_mod = getattr(self.params, qid)
+            pi_duration = qubit_mod.pulses.pi.sigma() * qubit_mod.pulses.pi.n_sigma() * 2
+            result.append(QubitObservableProto(
+                qubit_id=qid,
+                t1=qubit_mod.qubit.T1(),
+                t2=qubit_mod.qubit.T2R(),
+                anharmonicity=0.0,
+                frequency=qubit_mod.qubit.freq(),
+                gate_fidelity_1q=0.0,
+                gate_fidelity_2q=0.0,
+                rx_duration=pi_duration,
+                ry_duration=pi_duration,
+                sqrt_iswap_duration=0.0,
+                reset_duration=self.params.qick.final_delay(),
+                measurement_duration=qubit_mod.readout.len(),
+                max_circuit_depth=2000,
+            ))
+        return result
+
+    def GetObservables(self, request: GetObservablesRequest, context: grpc.ServicerContext) -> GetObservablesResponse:
+        logger.info("GetObservables called")
+        if self.params is None:
+            logger.warning("GetObservables called but params is not initialized")
+            return GetObservablesResponse(status=False)
+        try:
+            qubits = self._collect_observables()
+            return GetObservablesResponse(status=True, qubits=qubits)
+        except Exception as e:
+            logger.error(f"GetObservables failed: {e}")
+            return GetObservablesResponse(status=False)
