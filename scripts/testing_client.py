@@ -10,7 +10,7 @@ if __name__ == "__main__":
     ret = client.start_res_spec()
     print("res_spec done")
     import pprint
-    pprint.pprint(ret)
+    # pprint.pprint(ret)
     # ret = client.start_res_spec_vs_gain()
     # print("res_spec_vs_gain done")
     # ret = client.start_sat_spec()
@@ -33,5 +33,6 @@ if __name__ == "__main__":
     # print("all done baby")
     #
 
-    # ret = client.start_tuneup_protocol()
+    ret = client.start_tuneup_protocol()
+    pprint.pprint(ret)
 

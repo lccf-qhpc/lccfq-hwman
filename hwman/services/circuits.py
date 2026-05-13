@@ -3,11 +3,14 @@ Service for executing quantum circuits on the QPU hardware.
 """
 
 import logging
-from dataclasses import dataclass
+from collections import Counter
 from typing import Any, Dict, List
 from pathlib import Path
 
 import grpc
+
+from labcore.measurement.storage import run_and_save_sweep
+from labcore.data.datadict_storage import datadict_from_hdf5
 
 from hwman.grpc.protobufs_compiled.circuits_pb2_grpc import CircuitsServicer  # type: ignore
 from hwman.grpc.protobufs_compiled.circuits_pb2 import (  # type: ignore
@@ -17,50 +20,12 @@ from hwman.grpc.protobufs_compiled.circuits_pb2 import (  # type: ignore
     Gate as ProtoGate,
 )
 from hwman.services import Service
-from hwman.hw_tests.utils import generate_id
-
-# Import Gate model from lccfq-backend for internal representation
-from lccfq_backend.model.tasks import Gate
+from hwman.services.readout_calibrator import ReadoutCalibrator
+from hwman.utils.hw_tests import generate_id
+from hwman.compiler.circuit import Circuit
+from hwman.compiler.qick_codegen import QICKProgramGenerator, compile_circuit_to_qick
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class Circuit:
-    """
-    Internal representation of a quantum circuit for compilation.
-
-    This wraps the gates received from gRPC in a form suitable for
-    passing to the QICK compiler.
-    """
-
-    gates: List[Gate]
-    shots: int
-    pid: str = ""
-
-    def __len__(self) -> int:
-        return len(self.gates)
-
-    def __iter__(self):
-        return iter(self.gates)
-
-    @classmethod
-    def from_proto(cls, request: RunCircuitRequest) -> "Circuit":
-        """
-        Create a Circuit from a gRPC RunCircuitRequest.
-
-        Converts protobuf Gate messages to internal Gate models.
-        """
-        gates = [
-            Gate(
-                symbol=g.symbol,
-                target_qubits=list(g.target_qubits),
-                control_qubits=list(g.control_qubits),
-                params=list(g.params),
-            )
-            for g in request.gates
-        ]
-        return cls(gates=gates, shots=request.shots, pid=request.pid)
 
 
 class CircuitService(Service, CircuitsServicer):
@@ -70,6 +35,8 @@ class CircuitService(Service, CircuitsServicer):
         self,
         data_dir: Path,
         fake_circuit_data: bool = False,
+        calibrator: ReadoutCalibrator | None = None,
+        conf: Any = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -79,11 +46,15 @@ class CircuitService(Service, CircuitsServicer):
         Args:
             data_dir: Directory for storing circuit execution results
             fake_circuit_data: If True, return mock data instead of executing on hardware
+            calibrator: Fitted ReadoutCalibrator for shot classification
+            conf: QickConfig object providing the QICK hardware connection
         """
         logger.info("Initializing CircuitService")
         super().__init__(*args, **kwargs)
         self.data_dir = data_dir
         self.fake_circuit_data = fake_circuit_data
+        self.calibrator = calibrator
+        self.conf = conf
 
     def _start(self) -> None:
         """Initialize the circuit execution environment."""
@@ -152,10 +123,10 @@ class CircuitService(Service, CircuitsServicer):
 
             if self.fake_circuit_data:
                 # Return mock data for testing
-                distribution = self._generate_fake_distribution(circuit.shots)
+                distribution, raw_bitstream = self._generate_fake_distribution(circuit.shots)
             else:
                 # Execute on real hardware
-                distribution = self._execute_circuit(circuit)
+                distribution, raw_bitstream = self._execute_circuit(circuit)
 
             # Convert distribution dict to proto format
             distribution_entries = [
@@ -169,6 +140,7 @@ class CircuitService(Service, CircuitsServicer):
                 success=True,
                 message="Circuit executed successfully",
                 distribution=distribution_entries,
+                raw_bitstream=raw_bitstream,
                 data_path=str(self.data_dir / pid),
             )
 
@@ -181,7 +153,7 @@ class CircuitService(Service, CircuitsServicer):
                 distribution=[],
             )
 
-    def _execute_circuit(self, circuit: Circuit) -> Dict[str, int]:
+    def _execute_circuit(self, circuit: Circuit) -> tuple[Dict[str, int], List[str]]:
         """
         Execute a circuit on the QICK hardware.
 
@@ -190,30 +162,62 @@ class CircuitService(Service, CircuitsServicer):
 
         Returns:
             Dictionary mapping bitstrings to counts
+        """
+        if self.calibrator is None:
+            raise RuntimeError(
+                "ReadoutCalibrator is not fitted. Run ROCal before executing circuits."
+            )
+        if self.conf is None:
+            raise RuntimeError(
+                "No QICK connection available. Provide a conf object at initialization."
+            )
+        generator = QICKProgramGenerator(circuit)
+        measured_qubits = generator._get_measured_qubits_in_order()
+
+        source = compile_circuit_to_qick(circuit)
+
+        ns: Dict[str, Any] = {}
+        exec(source, ns)
+        prev_reps = self.conf.params.qick.default_reps()
+        self.conf.params.qick.default_reps(1)
+        try:
+            sweep = ns["CompiledProgram"]()
+            data_loc, _ = run_and_save_sweep(sweep, str(self.data_dir), circuit.pid, source_code=str({source}))
+        finally:
+            self.conf.params.qick.default_reps(prev_reps)
+
+        data = datadict_from_hdf5(Path(data_loc) / "data.ddh5")
+        return self._label_shots(data, measured_qubits)
+
+    def _label_shots(self, data: dict, measured_qubits: List[int]) -> tuple[Dict[str, int], List[str]]:
+        """Convert raw QICK IQ data into a bitstring count distribution.
+
+        Args:
+            data: datadict from datadict_from_hdf5. Keys are "qubit_{q}"; each
+                  entry's ["values"] is a complex numpy array of shape (shots,).
+            measured_qubits: qubit indices in measurement order, matching the
+                             ComplexQICKData variables in the generated program.
+
+        Returns:
+            Tuple of (counts dict mapping bitstrings to shot counts, raw per-shot bitstring list).
 
         Raises:
-            NotImplementedError: Circuit execution on real hardware not yet implemented
+            RuntimeError: If the calibrator has not been fitted via ROCal.
         """
-        # TODO: Implement actual circuit execution on QICK hardware
-        # This would involve:
-        # 1. Transpiling gates to QICK-compatible pulse sequences
-        # 2. Loading the program onto the QICK board
-        # 3. Running the experiment with the specified shots
-        # 4. Collecting and processing measurement results
-        #
-        # Example transpilation mapping:
-        # - "H" (Hadamard) -> RY(π/2) pulse
-        # - "X" -> RX(π) pulse
-        # - "RZ" -> Virtual Z rotation (phase update)
-        # - "CNOT" -> Cross-resonance or iSWAP decomposition
-        #
-        # For now, raise NotImplementedError to indicate this needs implementation
-        raise NotImplementedError(
-            "Circuit execution on real QICK hardware is not yet implemented. "
-            "Set fake_circuit_data=True for testing with mock data."
-        )
+        labels_per_qubit = []
+        for q in measured_qubits:
+            raw = data[f"qubit_{q}"]["values"]  # complex array, shape (shots,)
+            labels_per_qubit.append(self.calibrator.label(raw.real.flatten(), raw.imag.flatten()))
 
-    def _generate_fake_distribution(self, shots: int) -> Dict[str, int]:
+        n_shots = len(labels_per_qubit[0])
+        bitstrings = [
+            "".join(str(labels_per_qubit[qi][s]) for qi in range(len(measured_qubits)))
+            for s in range(n_shots)
+        ]
+
+        return dict(Counter(bitstrings)), bitstrings
+
+    def _generate_fake_distribution(self, shots: int) -> tuple[Dict[str, int], List[str]]:
         """
         Generate a fake measurement distribution for testing.
 
@@ -221,9 +225,9 @@ class CircuitService(Service, CircuitsServicer):
             shots: Number of measurement shots
 
         Returns:
-            Dictionary mapping bitstrings to counts
+            Tuple of (counts dict, raw per-shot bitstring list).
         """
-        # Generate a simple fake distribution (Bell state-like)
         counts_00 = shots // 2
         counts_11 = shots - counts_00
-        return {"00": counts_00, "11": counts_11}
+        raw_bitstream = ["00"] * counts_00 + ["11"] * counts_11
+        return {"00": counts_00, "11": counts_11}, raw_bitstream

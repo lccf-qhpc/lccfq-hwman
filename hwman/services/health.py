@@ -151,17 +151,27 @@ class HealthService(Service, HealthServicer):
                 f"Started instrumentserver with PID: {self.instrumentserver_process.pid}"
             )
 
-            # Loading parameters
-            instrument_client = ins_c()
-            params = instrument_client.get_instrument("parameter_manager")
-            instrumentserver_logger.info(f"Loading parameters from {self.instrumentserver_params_file}")
-            params.fromFile(self.instrumentserver_params_file)
-            instrumentserver_logger.info("Testing parameters loaded successfully")
-            if params.qubit.f_ge() is not None:
-                instrumentserver_logger.info(f"Qubit frequency: {params.qubit.f_ge()}")
-            else:
-                instrumentserver_logger.error("Qubit frequency is None")
-                return False, "Qubit frequency is None"
+            # Loading parameters - retry up to 4 times if the server isn't ready yet
+            max_attempts = 4
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    instrument_client = ins_c()
+                    params = instrument_client.get_instrument("parameter_manager")
+                    instrumentserver_logger.info(f"Loading parameters from {self.instrumentserver_params_file} (attempt {attempt}/{max_attempts})")
+                    params.fromFile(self.instrumentserver_params_file)
+                    if params.q01.qubit.freq() is not None:
+                        instrumentserver_logger.info(f"Parameters loaded successfully on attempt {attempt}. Qubit frequency: {params.q01.qubit.freq()}")
+                        break
+                    else:
+                        instrumentserver_logger.warning(f"Qubit frequency is None on attempt {attempt}/{max_attempts}")
+                        if attempt == max_attempts:
+                            return False, "Qubit frequency is None after all attempts"
+                        time.sleep(2)
+                except Exception as attempt_error:
+                    instrumentserver_logger.warning(f"Attempt {attempt}/{max_attempts} failed: {attempt_error}")
+                    if attempt == max_attempts:
+                        raise
+                    time.sleep(2)
 
             return (
                 True,

@@ -5,7 +5,7 @@ This package compiles Circuit objects (containing Gate objects) into QICK progra
 
 Usage:
     from hwman.compiler import compile_circuit_to_qick
-    from hwman.services.circuits import Circuit
+    from hwman.compiler.circuit import Circuit
     from lccfq_backend.model.tasks import Gate
 
     gates = [
