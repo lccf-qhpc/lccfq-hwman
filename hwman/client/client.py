@@ -362,6 +362,16 @@ class Client:
             logger.error(f"Failed to get observables: {e}")
             return None
 
+    def measure_observables(self, save_to_file: bool = True):
+        try:
+            assert self.test_stub is not None, "Test stub is not initialized"
+            ret = self.test_stub.MeasureObservables(
+                TestRequest(save_to_file=save_to_file)
+            )
+            return ret
+        except grpc.RpcError as e:
+            logger.error(f"Failed to measure observables: {e}")
+
     def run_circuit(
         self,
         gates: list[dict],
