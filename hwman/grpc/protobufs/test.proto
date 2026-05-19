@@ -81,5 +81,6 @@ service Test {
     rpc T2E(TestRequest) returns (TestResponse);
     rpc ROCal(TestRequest) returns (TestResponse);
     rpc TuneUpProtocol(TestRequest) returns (TestResponse);
+    rpc MeasureObservables(TestRequest) returns (TestResponse);
     rpc GetObservables(GetObservablesRequest) returns (GetObservablesResponse);
 }
