@@ -141,7 +141,7 @@ class TestService(Service, TestServicer):
         return fit_params
 
     def _save_params_if_requested(self, request: TestRequest) -> None:
-        if request.save_to_file:
+        if request.save_to_file and self.params is not None:
             logger.info(f"Saving parameters to {self.params_file}")
             self.params.toFile(filePath=self.params_file)
 
@@ -257,6 +257,16 @@ class TestService(Service, TestServicer):
         op.execute()
         self._save_params_if_requested(request)
         logger.info("TuneUpProtocol finished")
+        return TestResponse(status=True, pid=job_id)
+
+    def MeasureObservables(self, request, context):
+        logger.info("MeasureObservables called")
+        job_id = request.pid or generate_id()
+
+        # TODO: Implement measurement
+
+        self._save_params_if_requested(request)
+        logger.info("MeasureObservables finished")
         return TestResponse(status=True, pid=job_id)
 
     def _collect_observables(self) -> list[QubitObservableProto]:
