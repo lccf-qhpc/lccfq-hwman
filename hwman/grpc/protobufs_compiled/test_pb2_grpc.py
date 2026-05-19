@@ -94,6 +94,11 @@ class TestStub(object):
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
                 response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
                 _registered_method=True)
+        self.MeasureObservables = channel.unary_unary(
+                '/hwman.Test/MeasureObservables',
+                request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
+                response_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
+                _registered_method=True)
         self.GetObservables = channel.unary_unary(
                 '/hwman.Test/GetObservables',
                 request_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.GetObservablesRequest.SerializeToString,
@@ -176,6 +181,12 @@ class TestServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def MeasureObservables(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetObservables(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -242,6 +253,11 @@ def add_TestServicer_to_server(servicer, server):
             ),
             'TuneUpProtocol': grpc.unary_unary_rpc_method_handler(
                     servicer.TuneUpProtocol,
+                    request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
+                    response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.SerializeToString,
+            ),
+            'MeasureObservables': grpc.unary_unary_rpc_method_handler(
+                    servicer.MeasureObservables,
                     request_deserializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.FromString,
                     response_serializer=hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.SerializeToString,
             ),
@@ -573,6 +589,33 @@ class Test(object):
             request,
             target,
             '/hwman.Test/TuneUpProtocol',
+            hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
+            hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def MeasureObservables(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/hwman.Test/MeasureObservables',
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestRequest.SerializeToString,
             hwman_dot_grpc_dot_protobufs_dot_test__pb2.TestResponse.FromString,
             options,
