@@ -4,6 +4,7 @@ from concurrent import futures
 import grpc
 
 from hwman.certificate_manager import CertificateManager
+from hwman.compiler.custom_pulses import load_custom_pulses, set_custom_pulses
 from hwman.config import HwmanSettings
 from hwman.grpc.protobufs_compiled import health_pb2_grpc, test_pb2_grpc, circuits_pb2_grpc
 from hwman.services.health import HealthService
@@ -35,6 +36,11 @@ class Server:
         self.start_external_services = config.start_external_services
         self.fake_calibration_data = config.fake_calibration_data
         self.data_dir = config.data_dir
+
+        logger.info(f"Loading custom pulses from {config.custom_pulses_dir}...")
+        custom_pulses = load_custom_pulses(config.custom_pulses_dir)
+        set_custom_pulses(custom_pulses)
+        logger.info(f"Loaded {len(custom_pulses)} custom pulse(s): {sorted(custom_pulses)}")
 
         self.server_cert: bytes | None = None
         self.server_key: bytes | None = None

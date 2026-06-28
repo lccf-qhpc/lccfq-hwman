@@ -32,5 +32,8 @@ qick_xilinx_xrt = "/usr"
 data_dir = "./data"
 fake_calibration_data = false  # Set to true for testing without hardware
 
+# Custom pulse settings
+custom_pulses_dir = "./configs/pulses"  # One JSON file per pulse: {"name": ..., "idata": [...], "qdata": [...]}
+
 # Service startup
 start_external_services = true  # Start instrumentserver, nameserver, and QICK server on startup

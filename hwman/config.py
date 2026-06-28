@@ -77,6 +77,12 @@ class HwmanSettings(BaseSettings):
     data_dir: Path = Field(
         default=Path("./data"), description="Directory for experimental data"
     )
+
+    # Custom pulse settings
+    custom_pulses_dir: Path = Field(
+        default=Path("./configs/pulses"),
+        description="Directory of custom pulse JSON files (one file per pulse, name + I/Q PCM samples)",
+    )
     fake_calibration_data: bool = Field(
         default=False,
         description="Use fake calibration data for testing without hardware",

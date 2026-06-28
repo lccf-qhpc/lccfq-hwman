@@ -18,6 +18,7 @@ from labcore.measurement import independent
 from labcore.measurement.sweep import Sweep
 
 from hwman.compiler.circuit import Circuit
+from hwman.compiler.custom_pulses import CustomPulseDefinition, get_custom_pulses
 from lccfq_backend.model.tasks import Gate
 from hwman.errors import (
     UnsupportedGateError,
@@ -48,22 +49,36 @@ GATE_LIBRARY = {
 MEASURE = "measure"
 
 
-def validate(circuit: Circuit) -> None:
+def validate(
+    circuit: Circuit, custom_pulses: Optional[dict[str, CustomPulseDefinition]] = None
+) -> None:
     """Validate a circuit before building a program.
+
+    Args:
+        circuit: Circuit to validate.
+        custom_pulses: Custom pulse registry to accept gate symbols from, in
+            addition to ``GATE_LIBRARY``. Defaults to the active registry
+            loaded via :func:`~hwman.compiler.custom_pulses.set_custom_pulses`.
 
     Raises:
         TwoQubitGateNotImplementedError: If any gate has control qubits.
-        UnsupportedGateError: If a gate symbol is not in ``GATE_LIBRARY``.
+        UnsupportedGateError: If a gate symbol is not in ``GATE_LIBRARY`` and
+            not a known custom pulse name.
         CircuitMissingMeasurementError: If the circuit has no measurement.
     """
+    if custom_pulses is None:
+        custom_pulses = get_custom_pulses()
+
     has_measure_gate = False
     for gate in circuit.gates:
         if len(gate.control_qubits) != 0:
             raise TwoQubitGateNotImplementedError("Two qubit gates are not yet implemented.")
 
         symbol = gate.symbol.lower()
-        if symbol not in GATE_LIBRARY:
-            raise UnsupportedGateError(symbol, list(GATE_LIBRARY.keys()))
+        if symbol not in GATE_LIBRARY and symbol not in custom_pulses:
+            raise UnsupportedGateError(
+                symbol, list(GATE_LIBRARY.keys()) + list(custom_pulses.keys())
+            )
 
         if symbol == MEASURE:
             has_measure_gate = True
@@ -128,10 +143,14 @@ class CircuitProgram(AveragerProgramV2):
 
     The circuit is supplied as the ``circuit`` class attribute (set per circuit
     via :func:`build_circuit_sweep`); tuning values are read from ``cfg`` at
-    runtime.
+    runtime. ``custom_pulses`` holds any pulses not in ``GATE_LIBRARY``: a gate
+    symbol that matches a custom pulse name is played as a single-qubit drive
+    pulse using that pulse's raw I/Q envelope (via ``add_envelope``), with
+    phase 0 and the usual ``q_pi_gain``/params gain scaling.
     """
 
     circuit: Circuit
+    custom_pulses: dict[str, CustomPulseDefinition] = {}
 
     @staticmethod
     def _qubit_gen_ch(cfg: dict, qubit: int) -> Any:
@@ -154,11 +173,20 @@ class CircuitProgram(AveragerProgramV2):
         self.add_loop("shots_loop", self.circuit.shots)
 
         # Add the Gaussian envelope on every distinct generator channel that
-        # plays a gauss-style pulse (QICK envelopes are per-channel).
+        # plays a gauss-style pulse, and the raw I/Q envelope for every
+        # distinct (custom pulse name, channel) pair (QICK envelopes are
+        # per-channel).
         gauss_channels = set()
+        custom_envelope_channels: dict[str, set] = {}
         for gate, target, _ in _flatten_operations(self.circuit):
-            if GATE_LIBRARY[gate.symbol.lower()].pulse_type == "gauss":
-                gauss_channels.add(self._qubit_gen_ch(cfg, target))
+            symbol = gate.symbol.lower()
+            ch = self._qubit_gen_ch(cfg, target)
+            if symbol in GATE_LIBRARY:
+                if GATE_LIBRARY[symbol].pulse_type == "gauss":
+                    gauss_channels.add(ch)
+            else:
+                custom_envelope_channels.setdefault(symbol, set()).add(ch)
+
         for ch in sorted(gauss_channels):
             self.add_gauss(
                 ch=ch,
@@ -167,13 +195,17 @@ class CircuitProgram(AveragerProgramV2):
                 length=cfg["q_pi_n_sigma"] * cfg["q_pi_sigma"],
                 even_length=True,
             )
+        for symbol, channels in custom_envelope_channels.items():
+            idata, qdata = self.custom_pulses[symbol].to_arrays()
+            for ch in sorted(channels):
+                self.add_envelope(ch=ch, name=symbol, idata=idata, qdata=qdata)
 
         # Declare every pulse used by the circuit
         for gate, target, pulse_name in _flatten_operations(self.circuit):
             symbol = gate.symbol.lower()
-            gate_cfg = GATE_LIBRARY[symbol]
 
             if symbol == MEASURE:
+                gate_cfg = GATE_LIBRARY[symbol]
                 self.add_pulse(
                     ch=ro_gen_ch,
                     name=pulse_name,
@@ -184,21 +216,30 @@ class CircuitProgram(AveragerProgramV2):
                     phase=gate_cfg.phase,
                     gain=cfg["ro_gain"],
                 )
+                continue
+
+            gain = cfg["q_pi_gain"]
+            # Parametric gates (e.g. rx(theta)): scale the pi-pulse gain by
+            # the rotation angle. params[0] is the rotation angle in radians.
+            if gate.params:
+                gain = cfg["q_pi_gain"] * gate.params[0] / np.pi
+
+            if symbol in GATE_LIBRARY:
+                phase = GATE_LIBRARY[symbol].phase
+                envelope = "gauss"
             else:
-                gain = cfg["q_pi_gain"]
-                # Parametric gates (e.g. rx(theta)): scale the pi-pulse gain by
-                # the rotation angle. params[0] is the rotation angle in radians.
-                if gate.params:
-                    gain = cfg["q_pi_gain"] * gate.params[0] / np.pi
-                self.add_pulse(
-                    ch=self._qubit_gen_ch(cfg, target),
-                    name=pulse_name,
-                    style="arb",
-                    envelope="gauss",
-                    freq=cfg["q_freq"],
-                    phase=gate_cfg.phase,
-                    gain=gain,
-                )
+                phase = 0.0
+                envelope = symbol
+
+            self.add_pulse(
+                ch=self._qubit_gen_ch(cfg, target),
+                name=pulse_name,
+                style="arb",
+                envelope=envelope,
+                freq=cfg["q_freq"],
+                phase=phase,
+                gain=gain,
+            )
 
         # Readout configuration
         self.add_readoutconfig(ch=ro_ch, name="myro", freq=cfg["ro_freq"], gen_ch=ro_gen_ch)
@@ -222,7 +263,9 @@ class CircuitProgram(AveragerProgramV2):
             self.delay_auto(t=0, gens=True, ros=True)
 
 
-def build_circuit_sweep(circuit: Circuit) -> Sweep:
+def build_circuit_sweep(
+    circuit: Circuit, custom_pulses: Optional[dict[str, CustomPulseDefinition]] = None
+) -> Sweep:
     """Compile a :class:`Circuit` into a runnable QICK ``Sweep``.
 
     Validates the circuit, builds the dynamic data specs (one
@@ -232,6 +275,8 @@ def build_circuit_sweep(circuit: Circuit) -> Sweep:
 
     Args:
         circuit: Circuit object containing gates, shots, and pid.
+        custom_pulses: Custom pulse registry. Defaults to the active registry
+            loaded via :func:`~hwman.compiler.custom_pulses.set_custom_pulses`.
 
     Returns:
         A ``Sweep`` ready to pass to ``run_and_save_sweep``.
@@ -240,14 +285,21 @@ def build_circuit_sweep(circuit: Circuit) -> Sweep:
         UnsupportedGateError, CircuitMissingMeasurementError,
         TwoQubitGateNotImplementedError: If the circuit is invalid.
     """
-    validate(circuit)
+    if custom_pulses is None:
+        custom_pulses = get_custom_pulses()
+
+    validate(circuit, custom_pulses)
 
     specs: List[Any] = [independent("repetition")]
     for q in measured_qubits_in_order(circuit):
         specs.append(ComplexQICKData(f"qubit_{q}", depends_on=["repetition"]))
 
     # Bind the circuit to a per-circuit subclass so _initialize/_body can read it.
-    program_cls = type("CompiledProgram", (CircuitProgram,), {"circuit": circuit})
+    program_cls = type(
+        "CompiledProgram",
+        (CircuitProgram,),
+        {"circuit": circuit, "custom_pulses": custom_pulses},
+    )
 
     decorated = QickBoardSweep(*specs)(program_cls)
     return decorated()

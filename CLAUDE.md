@@ -117,11 +117,27 @@ qick_xilinx_xrt = "/usr"
 data_dir = "./data"              # Directory for experimental data
 fake_calibration_data = false    # true for testing without hardware
 
+# Custom pulse settings
+custom_pulses_dir = "./configs/pulses"  # Directory of custom pulse JSON files (one file per pulse)
+
 # Service startup
 start_external_services = true   # Start instrumentserver, Pyro nameserver, and QICK server
 ```
 
 **QICK SSH Configuration**: The QICK SSH settings unify all QICK connection parameters in the configuration file. All SSH credentials and paths are now managed through the TOML config instead of environment variables.
+
+**Custom Pulses**: `custom_pulses_dir` points to a directory of pulse JSON files (one file per pulse), each Pydantic-validated by `CustomPulseDefinition` in `hwman/compiler/custom_pulses.py`:
+
+```json
+{
+  "name": "my_drag_pulse",
+  "idata": [0.0, 0.2, 0.6, 1.0, 0.6, 0.2, 0.0],
+  "qdata": [0.0, 0.05, 0.1, 0.0, -0.1, -0.05, 0.0],
+  "sample_rate_msps": 1000.0
+}
+```
+
+`idata`/`qdata` are normalized I/Q PCM envelope samples (the overall amplitude is applied by the gate's gain, same as built-in pulses). The server loads this directory at startup into a module-level registry (`set_custom_pulses`/`get_custom_pulses`); a circuit then references a custom pulse by using its `name` directly as a gate symbol (e.g. `Gate(symbol="my_drag_pulse", target_qubits=[0], ...)`). `CircuitProgram` plays it as a single-qubit drive pulse via QICK's `add_envelope`, and `hwman/compiler/pulse_diagram.py` renders/samples it like the built-in `gauss`/`const` shapes.
 
 ### Development
 

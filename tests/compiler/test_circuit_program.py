@@ -16,6 +16,7 @@ from hwman.compiler.circuit_program import (
     validate,
     _flatten_operations,
 )
+from hwman.compiler.custom_pulses import CustomPulseDefinition
 from hwman.errors import (
     UnsupportedGateError,
     CircuitMissingMeasurementError,
@@ -116,3 +117,45 @@ def test_build_circuit_sweep_validates():
     circuit = Circuit(gates=gates, shots=10, pid="t")
     with pytest.raises(CircuitMissingMeasurementError):
         build_circuit_sweep(circuit)
+
+
+def _custom_pulse(name: str = "my_custom") -> CustomPulseDefinition:
+    return CustomPulseDefinition(
+        name=name, idata=[0.0, 0.5, 1.0, 0.5, 0.0], qdata=[0.0, 0.1, 0.0, -0.1, 0.0]
+    )
+
+
+def test_validate_accepts_known_custom_pulse():
+    """A gate symbol matching a loaded custom pulse name passes validation."""
+    pulse = _custom_pulse()
+    gates = [
+        Gate(symbol="my_custom", target_qubits=[0], control_qubits=[], params=[]),
+        _measure(0),
+    ]
+    circuit = Circuit(gates=gates, shots=10, pid="t")
+    validate(circuit, custom_pulses={"my_custom": pulse})
+
+
+def test_validate_rejects_unknown_symbol_even_with_other_custom_pulses():
+    pulse = _custom_pulse()
+    gates = [
+        Gate(symbol="not_a_pulse", target_qubits=[0], control_qubits=[], params=[]),
+        _measure(0),
+    ]
+    circuit = Circuit(gates=gates, shots=10, pid="t")
+    with pytest.raises(UnsupportedGateError):
+        validate(circuit, custom_pulses={"my_custom": pulse})
+
+
+def test_build_circuit_sweep_with_custom_pulse():
+    """A circuit using a custom pulse by name compiles into a runnable Sweep."""
+    pulse = _custom_pulse()
+    gates = [
+        Gate(symbol="my_custom", target_qubits=[0], control_qubits=[], params=[]),
+        _measure(0),
+    ]
+    circuit = Circuit(gates=gates, shots=10, pid="t")
+
+    sweep = build_circuit_sweep(circuit, custom_pulses={"my_custom": pulse})
+
+    assert isinstance(sweep, Sweep)
